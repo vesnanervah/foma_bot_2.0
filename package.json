@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "npx ts-node src/index.ts"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "telegraf": "^4.16.3"
+  }
+}

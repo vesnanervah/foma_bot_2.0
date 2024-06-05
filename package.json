@@ -3,6 +3,7 @@
     "start": "npx ts-node src/index.ts"
   },
   "devDependencies": {
+    "@telegraf/types": "^7.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },

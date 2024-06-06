@@ -1,12 +1,14 @@
-import { Context, Telegraf } from "telegraf";
+import {  Telegraf } from "telegraf";
 import { message } from 'telegraf/filters';
-import { TG_TOKEN } from "../token";
-import context, { NarrowedContext } from "telegraf/typings/context";
-import { whoCommand } from "./simpleCommands/whoCommand";
+import { GEOCODER_KEY, TG_TOKEN } from "../token.js";
+import { whoCommand } from "./simpleCommands/whoCommand.js";
 import { LocalStorage } from 'node-localstorage';
+import { Geocoder } from "./geocoder/geocoder.js";
+
 
 const collectedMembersLocalStorageKey = 'members';
 const localStorage = new LocalStorage('./scratch');
+const geocoder = new Geocoder(GEOCODER_KEY);
 startApp();
 
 async function startApp(): Promise<void> {
@@ -17,6 +19,7 @@ async function startApp(): Promise<void> {
 
     const commands:Commands = {
         'кто': (commandArgument?: string, members?: Array<string>) => whoCommand(members!),
+        'координаты': (commandArgument?: string) => getCityCoordinates(commandArgument),
         'очистить_мемберов': () => {
             collectedMembers = new Array<string>;
             return 'Собранные мемберы почищены...'
@@ -63,6 +66,14 @@ function getLocalCollectedMembers(): Array<string>{
         return JSON.parse(savedMembers);
     }
     return new Array<string>;
+}
+
+async function getCityCoordinates(cityName?: string): Promise<string> {
+    if(!cityName || cityName.length === 0) {
+        return 'А город я угадать должен?';
+    }
+    var response = await geocoder.getCityCoordinates(cityName);
+    return `Координаты места ${cityName}:`
 }
 
 

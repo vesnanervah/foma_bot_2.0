@@ -1,6 +1,7 @@
 {
+  "type": "module",
   "scripts": {
-    "start": "npx ts-node src/index.ts"
+    "start": "npx tsx src/index.ts"
   },
   "devDependencies": {
     "@telegraf/types": "^7.1.0",
@@ -9,8 +10,9 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.22.0",
+    "got": "^14.4.0",
     "node-localstorage": "^3.0.5",
-    "telegraf": "^4.16.3"
+    "telegraf": "^4.16.3",
+    "tsx": "^4.12.0"
   }
 }

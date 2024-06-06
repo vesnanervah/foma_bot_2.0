@@ -1,14 +1,16 @@
 import {  Telegraf } from "telegraf";
 import { message } from 'telegraf/filters';
-import { GEOCODER_KEY, TG_TOKEN } from "../token.js";
+import { GEOCODER_KEY, TG_TOKEN, WEATHER_KEY } from "../token.js";
 import { whoCommand } from "./simpleCommands/whoCommand.js";
 import { LocalStorage } from 'node-localstorage';
-import { Geocoder } from "./geocoder/geocoder.js";
+import { Geocoder, GeocodingResult } from "./geocoder/geocoder.js";
+import { WeatherClient } from "./weather/weather.js";
 
 
 const collectedMembersLocalStorageKey = 'members';
 const localStorage = new LocalStorage('./scratch');
 const geocoder = new Geocoder(GEOCODER_KEY);
+const weatherClient = new WeatherClient(WEATHER_KEY);
 var isResponsing = false;
 startApp();
 
@@ -21,6 +23,7 @@ async function startApp(): Promise<void> {
     const commands:Commands = {
         'кто': (commandArgument?: string, members?: Array<string>) => whoCommand(members!),
         'координаты': (commandArgument?: string) => getCityCoordinates(commandArgument),
+        'погода': (commandArgument?: string) => getCurrentWeather(commandArgument),
         'очистить_мемберов': () => {
             collectedMembers = new Array<string>;
             return 'Собранные мемберы почищены...'
@@ -82,6 +85,17 @@ async function getCityCoordinates(cityName?: string): Promise<string> {
     return response.success ? `Координаты места ${cityName}: широта ${response.latitude}, долгота ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.');
 }
 
+async function getCurrentWeather(cityName?: string): Promise<string> {
+    if(!cityName || cityName.length === 0) {
+        return 'где именно то'
+    }
+    var geocodingResult = await geocoder.getCityCoordinates(cityName);
+    if (!geocodingResult.success ) {
+        return geocodingResult.errorMessage ??  'Незахендленный ерор. Еблан керик хуйни накодил.';
+    }
+    var currentWeather = await weatherClient.getCurrentWeather(geocodingResult, cityName);
+    return currentWeather;
+}
 
 type Commands = {
     [index: string]:  (commandArgument?: string, members?: Array<string>) => any; 

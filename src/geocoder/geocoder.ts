@@ -33,8 +33,6 @@ class Geocoder {
     }
 }
 
-export { Geocoder }
-
 class GeocodingResult {
     success: boolean;
     longitude?: string;
@@ -79,3 +77,6 @@ type YandexGeoObject = {
         }
     }
 }
+
+
+export { Geocoder, GeocodingResult, };

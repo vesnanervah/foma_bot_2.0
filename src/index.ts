@@ -49,7 +49,7 @@ async function startApp(): Promise<void> {
             ctx.reply('Не понял');
             return;
         };
-        var result = commands[commandName.toLowerCase()](commandArgument, collectedMembers);
+        var result = await commands[commandName.toLowerCase()](commandArgument, collectedMembers);
         if (typeof result === 'string') {
             ctx.reply(result);
         }
@@ -73,7 +73,7 @@ async function getCityCoordinates(cityName?: string): Promise<string> {
         return 'А город я угадать должен?';
     }
     var response = await geocoder.getCityCoordinates(cityName);
-    return `Координаты места ${cityName}:`
+    return response.success ? `Координаты места ${cityName}: ширина - ${response.latitude}, долгода - ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.');
 }
 
 

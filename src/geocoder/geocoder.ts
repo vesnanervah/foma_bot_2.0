@@ -16,7 +16,7 @@ class Geocoder {
         console.log(response);
         if (response.statusCode == 200) {
             var result = JSON.parse(response.body) as GeocoderResponse;
-            if (result.response.GeoObjectCollection?.metaDataProperty?.GeocoderResponseMetaData?.found?.length === 0 ?? true) {
+            if (result.response.GeoObjectCollection?.metaDataProperty?.GeocoderResponseMetaData?.found == "0" ?? true) {
                 return new GeocodingResult({success: false, errorMessage: 'Че за хуйню ты написал? Я не могу найти такое место.'});
             }
             var [latutide, longitude] =result.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');

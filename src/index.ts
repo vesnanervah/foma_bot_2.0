@@ -28,10 +28,7 @@ async function startApp(): Promise<void> {
     };
 
     bot.on(message('text'), async (ctx) => {
-        if(isResponsing) {
-            return;
-        }
-        isResponsing = true;
+
         var sender = [ctx.update.message.from.first_name, (ctx.update.message.from.last_name ?? '')].join(' ').trim();
         if (sender && !collectedMembers.includes(sender)) {
             // Костыль сбор всех участников тк в api бота мы не можем получить список участников
@@ -44,10 +41,13 @@ async function startApp(): Promise<void> {
         if(!ctx.message.text.toLowerCase().startsWith('фома, ')) {
             return;
         }
-
+        if(isResponsing) {
+            return;
+        }
+        isResponsing = true;
         var command = ctx.message.text.slice(ctx.message.text.indexOf(',') + 1).trim().toLowerCase();
         var commandName = command.split(' ')[0];
-        var commandArgument = command.split(' ')[1];
+        var commandArgument = command.split(' ').slice(1).join(' ');
         console.log('Incoming command: ' + commandName)
         console.log('Incoming argument: ' + commandArgument)
         if (!commandName || commandName.length == 0 || !commands[commandName.toLowerCase()]) {
@@ -79,7 +79,7 @@ async function getCityCoordinates(cityName?: string): Promise<string> {
         return 'А город я угадать должен?';
     }
     var response = await geocoder.getCityCoordinates(cityName);
-    return response.success ? `Координаты места ${cityName}: широта - ${response.latitude}, долгота - ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.');
+    return response.success ? `Координаты места ${cityName}: широта ${response.latitude}, долгота ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.');
 }
 
 

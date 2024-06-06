@@ -9,6 +9,7 @@ import { Geocoder } from "./geocoder/geocoder.js";
 const collectedMembersLocalStorageKey = 'members';
 const localStorage = new LocalStorage('./scratch');
 const geocoder = new Geocoder(GEOCODER_KEY);
+var isResponsing = false;
 startApp();
 
 async function startApp(): Promise<void> {
@@ -27,6 +28,10 @@ async function startApp(): Promise<void> {
     };
 
     bot.on(message('text'), async (ctx) => {
+        if(isResponsing) {
+            return;
+        }
+        isResponsing = true;
         var sender = [ctx.update.message.from.first_name, (ctx.update.message.from.last_name ?? '')].join(' ').trim();
         if (sender && !collectedMembers.includes(sender)) {
             // Костыль сбор всех участников тк в api бота мы не можем получить список участников
@@ -47,12 +52,13 @@ async function startApp(): Promise<void> {
         console.log('Incoming argument: ' + commandArgument)
         if (!commandName || commandName.length == 0 || !commands[commandName.toLowerCase()]) {
             ctx.reply('Не понял');
-            return;
-        };
-        var result = await commands[commandName.toLowerCase()](commandArgument, collectedMembers);
-        if (typeof result === 'string') {
-            ctx.reply(result);
+        } else {
+            var result = await commands[commandName.toLowerCase()](commandArgument, collectedMembers);
+            if (typeof result === 'string') {
+                ctx.reply(result);
+            }
         }
+        isResponsing = false;
       });
 
     bot.launch();
@@ -73,7 +79,7 @@ async function getCityCoordinates(cityName?: string): Promise<string> {
         return 'А город я угадать должен?';
     }
     var response = await geocoder.getCityCoordinates(cityName);
-    return response.success ? `Координаты места ${cityName}: ширина - ${response.latitude}, долгода - ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.');
+    return response.success ? `Координаты места ${cityName}: широта - ${response.latitude}, долгота - ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.');
 }
 
 

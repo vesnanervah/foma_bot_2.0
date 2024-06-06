@@ -17,7 +17,7 @@ function whoCommand( members: Array<string>): string {
     }
     const member = members[Math.floor(Math.random() * members.length)];
     const prelude = preludes[Math.floor(Math.random() * preludes.length)]
-    return `${member} ${prelude}`;
+    return `${prelude} ${member}`;
 }
 
 export { whoCommand };

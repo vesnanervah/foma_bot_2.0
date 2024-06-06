@@ -8,6 +8,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.22.0",
     "telegraf": "^4.16.3"
   }
 }

@@ -19,7 +19,7 @@ class Geocoder {
             if (result.response.GeoObjectCollection?.metaDataProperty?.GeocoderResponseMetaData?.found == "0" ?? true) {
                 return new GeocodingResult({success: false, errorMessage: 'Че за хуйню ты написал? Я не могу найти такое место.'});
             }
-            var [latutide, longitude] =result.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
+            var [longitude, latutide] =result.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
             return new GeocodingResult({success: true, latitude: latutide, longitude: longitude});
         }
         return new GeocodingResult({

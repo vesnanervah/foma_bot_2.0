@@ -1,6 +1,5 @@
 import {  Telegraf } from "telegraf";
 import { message } from 'telegraf/filters';
-import { GEOCODER_KEY, TG_TOKEN, WEATHER_KEY } from "../token.js";
 import { whoCommand } from "./simpleCommands/whoCommand.js";
 import { LocalStorage } from 'node-localstorage';
 import { Geocoder, GeocodingResult } from "./geocoder/geocoder.js";
@@ -9,13 +8,13 @@ import { WeatherClient } from "./weather/weather.js";
 
 const collectedMembersLocalStorageKey = 'members';
 const localStorage = new LocalStorage('./scratch');
-const geocoder = new Geocoder(process.env.geocoder_key ?? GEOCODER_KEY);
-const weatherClient = new WeatherClient(process.env.weather_key ?? WEATHER_KEY);
+const geocoder = new Geocoder(process.env.geocoder_key!);
+const weatherClient = new WeatherClient(process.env.weather_key!);
 var isResponsing = false;
 startApp();
 
 async function startApp(): Promise<void> {
-    const bot = new Telegraf(process.env.tg_token ?? TG_TOKEN);
+    const bot = new Telegraf(process.env.tg_token!);
     const collectedMembersLocalStorageKey = 'members';
     var collectedMembers = getLocalCollectedMembers();
     console.log('Фома 2.0 взялся за работу!');

@@ -9,9 +9,13 @@ const preludes = [
     'Без базара, это',
     'Ну я выбираю', 
     'Тут стопудово: это',
+    'Олег Евгеньевич официально выбирает вариант:'
 ];
 
-function whoCommand( members: Array<string>): string {
+function whoCommand(commandArgument: string | undefined, members: Array<string>): string {
+    if(!commandArgument || commandArgument.length == 0) {
+        return 'Ты!';
+    }
     if (members.length < 3) {
         return 'Я знаю еще слишком мало юзеров...Давайте знакомиться!';
     }

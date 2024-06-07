@@ -12,7 +12,7 @@ const preludes = [
     'Олег Евгеньевич официально выбирает вариант:'
 ];
 
-function whoCommand(commandArgument: string | undefined, members: Array<string>): string {
+function whoCommandReply(commandArgument: string | undefined, members: Array<string>): string {
     if(!commandArgument || commandArgument.length == 0) {
         return 'Ты!';
     }
@@ -24,4 +24,4 @@ function whoCommand(commandArgument: string | undefined, members: Array<string>)
     return `${prelude} ${member}`;
 }
 
-export { whoCommand };
+export { whoCommandReply };

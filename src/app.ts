@@ -2,9 +2,10 @@ import { Telegraf } from "telegraf";
 import { GEOCODER_KEY, TG_TOKEN, WEATHER_KEY } from "../token.js";
 import { Geocoder } from "./geocoder/geocoder.js";
 import { WeatherClient } from "./weatherClient/weatherClient.js";
-import { whoCommand } from "./simpleCommands/whoCommand.js";
+import { whoCommandReply } from "./simpleCommandsReplies/whoCommandReply.js";
 import { message } from "telegraf/filters";
 import { MembersLocalStorage } from "./membersLocalStorage/membersLocalStorage.js";
+import { unknownCommandReply } from "./simpleCommandsReplies/unknownCommandReply.js";
 
 class App {
     private isResponsing = false;
@@ -13,7 +14,7 @@ class App {
     private bot = new Telegraf(TG_TOKEN);
     private membersLocalStorage = new MembersLocalStorage();
     private commands:Commands = {
-        'кто': (commandArgument?: string, members?: Array<string>) => whoCommand(commandArgument, members!),
+        'кто': (commandArgument?: string, members?: Array<string>) => whoCommandReply(commandArgument, members!),
         'координаты': (commandArgument?: string) => this.getCityCoordinates(commandArgument),
         'погода': (commandArgument?: string) => this.getCurrentWeather(commandArgument),
         'очистить_мемберов': () => this.clearColletedMembers(),
@@ -44,7 +45,7 @@ class App {
             console.log('Incoming command: ' + commandName)
             console.log('Incoming argument: ' + commandArgument)
             if (!commandName || commandName.length == 0 || !this.commands[commandName.toLowerCase()]) {
-                ctx.reply('Не понял');
+                ctx.reply(unknownCommandReply());
             } else {
                 var result = await this.commands[commandName.toLowerCase()](commandArgument, this.membersLocalStorage.collectedMembers);
                 if (typeof result === 'string') {

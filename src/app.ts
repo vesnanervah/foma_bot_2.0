@@ -6,6 +6,7 @@ import { whoCommandReply } from "./simpleCommandsReplies/whoCommandReply.js";
 import { message } from "telegraf/filters";
 import { MembersLocalStorage } from "./membersLocalStorage/membersLocalStorage.js";
 import { unknownCommandReply } from "./simpleCommandsReplies/unknownCommandReply.js";
+import { getWhenReply } from "./simpleCommandsReplies/whenCommandReply.js";
 
 class App {
     private isResponsing = false;
@@ -17,6 +18,7 @@ class App {
         'кто': (commandArgument?: string, members?: Array<string>) => whoCommandReply(commandArgument, members!),
         'координаты': (commandArgument?: string) => this.getCityCoordinates(commandArgument),
         'погода': (commandArgument?: string) => this.getCurrentWeather(commandArgument),
+        'когда': () => getWhenReply(),
         'очистить_мемберов': () => this.clearColletedMembers(),
     };
 

@@ -37,7 +37,7 @@ class WeatherClient {
     private getWeatherString(weather: CurrentWeather, cityName: string) {
         const wind_mpm = Math.round(weather.wind_kph /3.6);
 
-        return `В ${cityName} сейчас ${this.getAboutTemperatureString(weather.temp_c)}: ${weather.temp_c} градусов. Скорость ветра достигает ${wind_mpm} метра в секунду. Влажность воздуха составляет: ${weather.humidity}`;
+        return `В локации ${cityName} сейчас ${this.getAboutTemperatureString(weather.temp_c)}: ${weather.temp_c}°С. Скорость ветра достигает ${wind_mpm}м/с. Влажность воздуха составляет: ${weather.humidity}`;
     }
 
     private getAboutTemperatureString(temp: number) : string {

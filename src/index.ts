@@ -48,8 +48,8 @@ async function startApp(): Promise<void> {
             return;
         }
         isResponsing = true;
-        var command = ctx.message.text.slice(ctx.message.text.indexOf(',') + 1).trim().toLowerCase();
-        var commandName = command.split(' ')[0];
+        var command = ctx.message.text.slice(ctx.message.text.indexOf(',') + 1).trim();
+        var commandName = command.split(' ')[0].toLowerCase();
         var commandArgument = command.split(' ').slice(1).join(' ');
         console.log('Incoming command: ' + commandName)
         console.log('Incoming argument: ' + commandArgument)

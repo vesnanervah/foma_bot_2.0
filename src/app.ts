@@ -4,7 +4,7 @@ import { Geocoder } from "./geocoder/geocoder.js";
 import { WeatherClient } from "./weatherClient/weatherClient.js";
 import { whoCommand } from "./simpleCommands/whoCommand.js";
 import { message } from "telegraf/filters";
-import { MembersLocalStorage } from "./membersLocalStorage/collectedMembers.js";
+import { MembersLocalStorage } from "./membersLocalStorage/membersLocalStorage.js";
 
 class App {
     private isResponsing = false;
@@ -13,7 +13,7 @@ class App {
     private bot = new Telegraf(TG_TOKEN);
     private membersLocalStorage = new MembersLocalStorage();
     private commands:Commands = {
-        'кто': (commandArgument?: string, members?: Array<string>) => whoCommand(members!),
+        'кто': (commandArgument?: string, members?: Array<string>) => whoCommand(commandArgument, members!),
         'координаты': (commandArgument?: string) => this.getCityCoordinates(commandArgument),
         'погода': (commandArgument?: string) => this.getCurrentWeather(commandArgument),
         'очистить_мемберов': () => this.clearColletedMembers(),
@@ -22,6 +22,7 @@ class App {
     startApp() {
         this.addTextSubscribtion();
         this.bot.launch();
+        console.log('Фома 2.0 начал работу');
         setInterval(() => console.log('Bot is online'), 100000);
     }
 

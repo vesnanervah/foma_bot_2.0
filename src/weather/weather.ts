@@ -1,6 +1,13 @@
 import got from "got";
 import { GeocodingResult } from "../geocoder/geocoder.js";
 
+
+const aboutHotTemperature = ['лютая жара', 'просто Вьетнам', 'настоящее пекло', 'невыносимо жарко', 'можно стать негром'];
+const aboutNiceTemperature = ['кайфово', 'в самый раз', 'непередаваемый балдеж', 'абсолютный чил'];
+const aboutCoolTemperature = ['сомнительно, но окэй', 'слегка прохладно', 'можно надеть ветровку', 'все еще заебись'];
+const aboutColdTemperature = ['слегка подмерзает', 'можно надеть любимый анорак с капюшоном', 'погода для похода на турники с китайцем'];
+const aboutFrozenTemperature = ['можно отморозить себе яица', 'лучше укутаться в пуховик', 'погода для настоящих нордов', 'стоит надеть подштаны'];
+
 class WeatherClient {
     private apiKey: string;
     private baseUrl = 'http://api.weatherapi.com/v1';
@@ -28,13 +35,34 @@ class WeatherClient {
     }
 
     private getWeatherString(weather: CurrentWeather, cityName: string) {
-        return `В ${cityName} сейчас ${weather.temp_c} градусов. Скорость ветра достигает ${weather.wind_kph} километра в час.`;
+        const wind_mpm = Math.round(weather.wind_kph /3.6);
+
+        return `В ${cityName} сейчас ${this.getAboutTemperatureString(weather.temp_c)}: ${weather.temp_c} градусов. Скорость ветра достигает ${wind_mpm} метра в секунду. Влажность воздуха составляет: ${weather.humidity}`;
+    }
+
+    private getAboutTemperatureString(temp: number) : string {
+        if(temp > 25) {
+            return aboutHotTemperature[Math.floor(aboutHotTemperature.length * Math.random())];
+        }
+        if(temp > 15) {
+            return aboutNiceTemperature[Math.floor(aboutNiceTemperature.length * Math.random())];
+        }
+        if (temp > 5) {
+            return aboutCoolTemperature[Math.floor(aboutCoolTemperature.length * Math.random())];
+        }
+        if (temp > -5) {
+            return aboutColdTemperature[Math.floor(aboutColdTemperature.length * Math.random())];
+        }
+        return aboutFrozenTemperature[Math.floor(aboutFrozenTemperature.length * Math.random())];
     }
 }
+
+
 
 type CurrentWeather = {
     temp_c: number,
     wind_kph: number,
+    humidity: number,
 }
 
 export {WeatherClient, CurrentWeather,}

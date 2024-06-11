@@ -7,7 +7,7 @@ import { message } from "telegraf/filters";
 import { MembersLocalStorage } from "./membersLocalStorage/membersLocalStorage.js";
 import { unknownCommandReply } from "./simpleCommandsReplies/unknownCommandReply.js";
 import { getWhenReply } from "./simpleCommandsReplies/whenCommandReply.js";
-
+import Jimp from "jimp";
 class App {
     private isResponsing = false;
     private geocoder = new Geocoder(GEOCODER_KEY);
@@ -24,6 +24,17 @@ class App {
 
     startApp() {
         this.addTextSubscribtion();
+        this.bot.on(message('photo'), async(ctx) => {
+            if(!ctx.message.caption || ctx.message.caption?.length == 0  || !ctx.message.caption!.toLowerCase().startsWith('фома, ')) {
+                return;
+            }
+            const url = await ctx.telegram.getFile(ctx.message.photo[1].file_id);
+            console.log(url.toString());
+            var img = await Jimp.read(url.toString());
+
+            // ctx.replyWithPhoto(url.toString());
+
+        });
         this.bot.launch();
         console.log('Фома 2.0 начал работу');
         setInterval(() => console.log('Bot is online'), 100000);

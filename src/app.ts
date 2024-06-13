@@ -7,7 +7,9 @@ import { message } from "telegraf/filters";
 import { MembersLocalStorage } from "./membersLocalStorage/membersLocalStorage.js";
 import { unknownCommandReply } from "./simpleCommandsReplies/unknownCommandReply.js";
 import { getWhenReply } from "./simpleCommandsReplies/whenCommandReply.js";
+import fs from 'node:fs/promises';
 import Jimp from "jimp";
+import path from 'node:path';
 class App {
     private isResponsing = false;
     private geocoder = new Geocoder(GEOCODER_KEY);
@@ -28,11 +30,14 @@ class App {
             if(!ctx.message.caption || ctx.message.caption?.length == 0  || !ctx.message.caption!.toLowerCase().startsWith('фома, ')) {
                 return;
             }
-            const url = await ctx.telegram.getFile(ctx.message.photo[1].file_id);
-            console.log(url.toString());
+            const url = await ctx.telegram.getFileLink(ctx.message.photo[1].file_id);
             var img = await Jimp.read(url.toString());
-
-            // ctx.replyWithPhoto(url.toString());
+            img.mirror(true, false);
+            // TODO: crop image from width/2 and mask above original image at crop start coordinates
+            // const filePath = `./cachedImages/${ctx.message.photo[1].file_id}.jpeg`;
+            // img.write(filePath);
+            var bufferedImg = await img.getBufferAsync(Jimp.MIME_JPEG);
+            ctx.replyWithPhoto({source: bufferedImg});
 
         });
         this.bot.launch();

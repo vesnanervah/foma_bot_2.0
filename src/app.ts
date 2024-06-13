@@ -1,4 +1,4 @@
-import { Telegraf } from "telegraf";
+import { Context, NarrowedContext, Telegraf } from "telegraf";
 import { GEOCODER_KEY, TG_TOKEN, WEATHER_KEY } from "../token.js";
 import { Geocoder } from "./geocoder/geocoder.js";
 import { WeatherClient } from "./weatherClient/weatherClient.js";
@@ -7,6 +7,8 @@ import { message } from "telegraf/filters";
 import { MembersLocalStorage } from "./membersLocalStorage/membersLocalStorage.js";
 import { unknownCommandReply } from "./simpleCommandsReplies/unknownCommandReply.js";
 import { getWhenReply } from "./simpleCommandsReplies/whenCommandReply.js";
+import { ImageClient } from "./imageClient/imageClient.js";
+import { Message, Update } from "@telegraf/types";
 
 class App {
     private isResponsing = false;
@@ -14,16 +16,20 @@ class App {
     private weatherClient = new WeatherClient(WEATHER_KEY);
     private bot = new Telegraf(TG_TOKEN);
     private membersLocalStorage = new MembersLocalStorage();
+    private imageClient = new ImageClient();
     private commands:Commands = {
         'кто': (commandArgument?: string, members?: Array<string>) => whoCommandReply(commandArgument, members!),
         'координаты': (commandArgument?: string) => this.getCityCoordinates(commandArgument),
         'погода': (commandArgument?: string) => this.getCurrentWeather(commandArgument),
         'когда': () => getWhenReply(),
         'очистить_мемберов': () => this.clearColletedMembers(),
+        'рсфср': (_, __, ctx) => this.getRcfcr(ctx!),
+        'шалаш': (_, __, ctx) => this.getShalash(ctx!),
     };
 
     startApp() {
         this.addTextSubscribtion();
+        this.addPhotoSubscribtion();
         this.bot.launch();
         console.log('Фома 2.0 начал работу');
         setInterval(() => console.log('Bot is online'), 100000);
@@ -49,7 +55,7 @@ class App {
             if (!commandName || commandName.length == 0 || !this.commands[commandName.toLowerCase()]) {
                 ctx.reply(unknownCommandReply());
             } else {
-                var result = await this.commands[commandName.toLowerCase()](commandArgument, this.membersLocalStorage.collectedMembers);
+                var result = await this.commands[commandName.toLowerCase()](commandArgument, this.membersLocalStorage.collectedMembers, ctx);
                 if (typeof result === 'string') {
                     ctx.reply(result);
                 }
@@ -58,12 +64,41 @@ class App {
           });
     }
 
+    private addPhotoSubscribtion() {
+        this.bot.on(message('photo'), async(ctx) => {
+            if(!ctx.message.caption || ctx.message.caption?.length == 0  || !ctx.message.caption!.toLowerCase().startsWith('фома, ')) {
+                return;
+            }
+            if(this.isResponsing) {
+                return;
+            }
+            this.isResponsing = true;
+            var command = ctx.message.caption.slice(ctx.message.caption.indexOf(',') + 1).trim();
+            var commandName = command.split(' ')[0].toLowerCase();
+            var commandArgument = command.split(' ').slice(1).join(' ');
+            console.log('Incoming command: ' + commandName);
+            console.log('Incoming argument: ' + commandArgument);
+            if (!commandName || commandName.length == 0 || !this.commands[commandName.toLowerCase()]) {
+                ctx.reply(unknownCommandReply());
+            } else {
+                var result = await this.commands[commandName.toLowerCase()](commandArgument, this.membersLocalStorage.collectedMembers, ctx);
+                if (typeof result === 'string') {
+                    ctx.reply(result);
+                } else {
+                    ctx.replyWithPhoto({source: result});
+                }
+            }
+            this.isResponsing = false;
+
+        });
+    }
+
     private clearColletedMembers() {
         this.membersLocalStorage.clearCollectedMembers();
         return 'Собранные мемберы почищены...'
     }
 
-    private async  getCityCoordinates(cityName?: string): Promise<string> {
+    private async getCityCoordinates(cityName?: string): Promise<string> {
         if(!cityName || cityName.length === 0) {
             return 'А город я угадать должен?';
         }
@@ -71,7 +106,7 @@ class App {
         return response.success ? `Координаты места ${cityName}: широта ${response.latitude}, долгота ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.');
     }
     
-    private async  getCurrentWeather(cityName?: string): Promise<string> {
+    private async getCurrentWeather(cityName?: string): Promise<string> {
         if(!cityName || cityName.length === 0) {
             return 'где именно то'
         }
@@ -82,10 +117,30 @@ class App {
         var currentWeather = await this.weatherClient.getCurrentWeather(geocodingResult, cityName);
         return currentWeather;
     }
+
+    private async getRcfcr(ctx: NarrowedContext<Context<Update>, Update.MessageUpdate<Record<"photo", {}> & Message.PhotoMessage>>): Promise<string | Buffer> {
+        try {
+            const url = await ctx.telegram.getFileLink(ctx.message.photo[1].file_id);
+            var rcfcr = await this.imageClient.getRcfcr(url.toString());
+            return rcfcr;
+        } catch {
+            return 'Не удалось сделать рсфср';
+        }
+    }
+
+    private async getShalash(ctx: NarrowedContext<Context<Update>, Update.MessageUpdate<Record<"photo", {}> & Message.PhotoMessage>>): Promise<string | Buffer> {
+        try {
+            const url = await ctx.telegram.getFileLink(ctx.message.photo[1].file_id);
+            var rcfcr = await this.imageClient.getShalash(url.toString());
+            return rcfcr;
+        } catch {
+            return 'Не удалось сделать шалаш';
+        }
+    }
 }
 
 type Commands = {
-    [index: string]:  (commandArgument?: string, members?: Array<string>) => any; 
+    [index: string]:  (commandArgument?: string, members?: Array<string>, ctx?: any) => any; 
 }
 
 export { App };

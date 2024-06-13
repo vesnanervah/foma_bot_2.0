@@ -23,7 +23,8 @@ class App {
         'погода': (commandArgument?: string) => this.getCurrentWeather(commandArgument),
         'когда': () => getWhenReply(),
         'очистить_мемберов': () => this.clearColletedMembers(),
-        'рсфср': (_, __, ctx) => this.getRcfcr(ctx!)
+        'рсфср': (_, __, ctx) => this.getRcfcr(ctx!),
+        'шалаш': (_, __, ctx) => this.getShalash(ctx!),
     };
 
     startApp() {
@@ -124,6 +125,16 @@ class App {
             return rcfcr;
         } catch {
             return 'Не удалось сделать рсфср';
+        }
+    }
+
+    private async getShalash(ctx: NarrowedContext<Context<Update>, Update.MessageUpdate<Record<"photo", {}> & Message.PhotoMessage>>): Promise<string | Buffer> {
+        try {
+            const url = await ctx.telegram.getFileLink(ctx.message.photo[1].file_id);
+            var rcfcr = await this.imageClient.getShalash(url.toString());
+            return rcfcr;
+        } catch {
+            return 'Не удалось сделать шалаш';
         }
     }
 }

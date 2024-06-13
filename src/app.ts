@@ -2,11 +2,11 @@ import { Context, NarrowedContext, Telegraf } from "telegraf";
 import { GEOCODER_KEY, TG_TOKEN, WEATHER_KEY } from "../token.js";
 import { Geocoder } from "./geocoder/geocoder.js";
 import { WeatherClient } from "./weatherClient/weatherClient.js";
-import { whoCommandReply } from "./simpleCommandsReplies/whoCommandReply.js";
+import { WhoCommandClient } from "./simpleCommandsReplies/whoCommandClient.js";
 import { message } from "telegraf/filters";
 import { MembersLocalStorage } from "./membersLocalStorage/membersLocalStorage.js";
-import { unknownCommandReply } from "./simpleCommandsReplies/unknownCommandReply.js";
-import { getWhenReply } from "./simpleCommandsReplies/whenCommandReply.js";
+import { UnknownCommandClient } from "./simpleCommandsReplies/unknownCommandClient.js";
+import { WhenCommandClient } from "./simpleCommandsReplies/whenCommandClient.js";
 import { ImageClient } from "./imageClient/imageClient.js";
 import { Message, Update } from "@telegraf/types";
 
@@ -17,11 +17,14 @@ class App {
     private bot = new Telegraf(TG_TOKEN);
     private membersLocalStorage = new MembersLocalStorage();
     private imageClient = new ImageClient();
+    private unknownCommandClient = new UnknownCommandClient();
+    private whenCommandClient = new WhenCommandClient();
+    private whoCommandnClient = new WhoCommandClient();
     private commands:Commands = {
-        'кто': (commandArgument?: string, members?: Array<string>) => whoCommandReply(commandArgument, members!),
+        'кто': (commandArgument?: string, members?: Array<string>) =>this.whoCommandnClient.whoCommandReply(commandArgument, members!),
         'координаты': (commandArgument?: string) => this.getCityCoordinates(commandArgument),
         'погода': (commandArgument?: string) => this.getCurrentWeather(commandArgument),
-        'когда': () => getWhenReply(),
+        'когда': () => this.whenCommandClient.getWhenReply(),
         'очистить_мемберов': () => this.clearColletedMembers(),
         'рсфср': (_, __, ctx) => this.getRcfcr(ctx!),
         'шалаш': (_, __, ctx) => this.getShalash(ctx!),
@@ -53,7 +56,7 @@ class App {
             console.log('Incoming command: ' + commandName)
             console.log('Incoming argument: ' + commandArgument)
             if (!commandName || commandName.length == 0 || !this.commands[commandName.toLowerCase()]) {
-                ctx.reply(unknownCommandReply());
+                ctx.reply(this.unknownCommandClient.unknownCommandReply());
             } else {
                 var result = await this.commands[commandName.toLowerCase()](commandArgument, this.membersLocalStorage.collectedMembers, ctx);
                 if (typeof result === 'string') {
@@ -79,7 +82,7 @@ class App {
             console.log('Incoming command: ' + commandName);
             console.log('Incoming argument: ' + commandArgument);
             if (!commandName || commandName.length == 0 || !this.commands[commandName.toLowerCase()]) {
-                ctx.reply(unknownCommandReply());
+                ctx.reply(this.unknownCommandClient.unknownCommandReply());
             } else {
                 var result = await this.commands[commandName.toLowerCase()](commandArgument, this.membersLocalStorage.collectedMembers, ctx);
                 if (typeof result === 'string') {

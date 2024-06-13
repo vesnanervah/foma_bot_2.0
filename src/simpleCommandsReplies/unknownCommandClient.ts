@@ -1,6 +1,4 @@
-function unknownCommandReply():string {
-    return replies[Math.floor(replies.length * Math.random())];
-}
+import { BaseSimpleCommandClient } from "./baseSimpleCommandClient.js";
 
 const replies = [
     'Меня твоя мама просила спросить: ты сколько раз в день зубы чистишь?',
@@ -15,7 +13,16 @@ const replies = [
     'Говорят, у меня хороший нюх - приключения на свою задницу я нахожу мгновенно',
     'Возникает подозрение, что ты шпион с Альдебарана',
     'Я посоветуюсь со своей головой и скажу тебе ответ попозже...',
-
+    'А ты в курсе, что мой хозяин потом читаеет всю ту ахинею, что ты тут пишешь, и угорает?'
 ]
+class UnknownCommandClient extends BaseSimpleCommandClient {
+    preludes: string[] = replies;
 
-export { unknownCommandReply };
+    unknownCommandReply():string {
+        return super.getRandomPrelude();
+    }
+    
+}
+
+
+export { UnknownCommandClient };

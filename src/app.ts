@@ -9,6 +9,7 @@ import { UnknownCommandClient } from "./simpleCommandsReplies/unknownCommandClie
 import { WhenCommandClient } from "./simpleCommandsReplies/whenCommandClient.js";
 import { ImageClient } from "./imageClient/imageClient.js";
 import { Message, Update } from "@telegraf/types";
+import { UnknownEnglishCommandClient } from "./simpleCommandsReplies/unknownEnglishCommandClient.js";
 
 class App {
     private isResponsing = false;
@@ -18,6 +19,7 @@ class App {
     private membersLocalStorage = new MembersLocalStorage();
     private imageClient = new ImageClient();
     private unknownCommandClient = new UnknownCommandClient();
+    private unknownEnglishCommandClient = new UnknownEnglishCommandClient();
     private whenCommandClient = new WhenCommandClient();
     private whoCommandnClient = new WhoCommandClient();
     private commands:Commands = {
@@ -57,7 +59,11 @@ class App {
             var commandArgument = command.split(' ').slice(1).join(' ');
             console.log('Incoming command: ' + commandName)
             console.log('Incoming argument: ' + commandArgument)
-            if (!commandName || commandName.length == 0 || !this.commands[commandName.toLowerCase()]) {
+            // TODO: split copypast bellow to separate method
+            if (/[a-z]/i.test(commandName)) {
+                // TODO: move all commands to regexps
+                ctx.reply(this.unknownEnglishCommandClient.unknownCommandReply());
+            } else if (!commandName || commandName.length == 0 || !this.commands[commandName.toLowerCase()]) {
                 ctx.reply(this.unknownCommandClient.unknownCommandReply());
             } else {
                 var result = await this.commands[commandName.toLowerCase()](commandArgument, this.membersLocalStorage.collectedMembers, ctx);

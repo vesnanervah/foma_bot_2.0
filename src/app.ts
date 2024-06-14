@@ -22,6 +22,8 @@ class App {
     private whoCommandnClient = new WhoCommandClient();
     private commands:Commands = {
         'кто': (commandArgument?: string, members?: Array<string>) =>this.whoCommandnClient.whoCommandReply(commandArgument, members!),
+        'кому': (commandArgument?: string, members?: Array<string>) =>this.whoCommandnClient.whoCommandReply(commandArgument, members!),
+        'кого': (commandArgument?: string, members?: Array<string>) =>this.whoCommandnClient.whoCommandReply(commandArgument, members!),
         'координаты': (commandArgument?: string) => this.getCityCoordinates(commandArgument),
         'погода': (commandArgument?: string) => this.getCurrentWeather(commandArgument),
         'когда': () => this.whenCommandClient.getWhenReply(),

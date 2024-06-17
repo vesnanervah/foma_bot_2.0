@@ -1,5 +1,7 @@
 import got from "got";
-import { GeocodingResult } from "../geocoder/geocoder.js";
+import { GeocoderClient, GeocodingResult } from "../geocoderClient/geocoderClient.js";
+import { GEOCODER_KEY } from "../../../token.js";
+import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 
 
 const aboutHotTemperature = ['лютая жара', 'просто Вьетнам', 'настоящее пекло', 'невыносимо жарко', 'можно стать негром'];
@@ -8,16 +10,35 @@ const aboutCoolTemperature = ['сомнительно, но окэй', 'слег
 const aboutColdTemperature = ['слегка подмерзает', 'можно надеть любимый анорак с капюшоном', 'погода для похода на турники с китайцем'];
 const aboutFrozenTemperature = ['можно отморозить себе яица', 'лучше укутаться в пуховик', 'погода для настоящих нордов', 'стоит надеть подштаны'];
 
-class WeatherClient {
+class WeatherClient extends BaseCommandClient{
+    triggerRegExp = /погода/i;
+
     private apiKey: string;
     private baseUrl = 'http://api.weatherapi.com/v1';
     private currentWeatherRelativePath = '/current.json';
+    private geocoder = new GeocoderClient(GEOCODER_KEY);
 
     constructor(apiKey: string) {
+        super();
         this.apiKey = apiKey;
     }
 
-    async getCurrentWeather(geocoding: GeocodingResult, cityName: string): Promise<string> {
+    async getReply(args: GetReplyArgs) {
+        // TODO: хендл окончаний и более живых форматов вопросов
+        if(!args.commandArgument || args.commandArgument.length === 0) {
+             args.ctx?.reply('где именно то')
+             return
+        }
+        var geocodingResult = await this.geocoder.getCityCoordinates(args.commandArgument!);
+        if (!geocodingResult.success ) {
+            args.ctx?.reply(geocodingResult.errorMessage ??  'Незахендленный ерор. Еблан керик хуйни накодил.');
+            return
+        }
+        var currentWeather = await this.getCurrentWeather(geocodingResult, args.commandArgument!);
+        args.ctx?.reply(currentWeather);
+    }
+
+    private async getCurrentWeather(geocoding: GeocodingResult, cityName: string): Promise<string> {
         var finalUrl = this.getFinalUrl(geocoding);
         var response = await got.get(finalUrl);
         if (response.statusCode !== 200 || !response.body) {

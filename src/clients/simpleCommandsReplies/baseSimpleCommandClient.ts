@@ -1,4 +1,6 @@
-abstract class BaseSimpleCommandClient {
+import { BaseCommandClient } from "../baseCommandClient.js";
+
+abstract class BaseSimpleCommandClient extends BaseCommandClient{
     protected abstract preludes: Array<string>;
 
     

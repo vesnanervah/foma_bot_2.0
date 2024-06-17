@@ -1,13 +1,25 @@
 import {got } from 'got'
+import { BaseCommandClient, GetReplyArgs } from '../baseCommandClient.js';
 
 
-class Geocoder {
+class GeocoderClient extends BaseCommandClient{
+    triggerRegExp = /координаты/i;
     private apiKey: string;
     private baseUrl = 'https://geocode-maps.yandex.ru/1.x';
 
 
     constructor(apiKey: string) {
+        super();
         this.apiKey = apiKey;
+    }
+
+    async getReply(args: GetReplyArgs) {
+        if(!args.commandArgument || args.commandArgument.length === 0) {
+            args.ctx?.reply('А город я угадать должен?');
+            return
+        }
+        var response = await this.getCityCoordinates(args.commandArgument!);
+        args.ctx?.reply(response.success ? `Координаты места ${args.commandArgument!}: широта ${response.latitude}, долгота ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.'));
     }
 
     async getCityCoordinates(cityName: string): Promise<GeocodingResult> {
@@ -79,4 +91,4 @@ type YandexGeoObject = {
 }
 
 
-export { Geocoder, GeocodingResult, };
+export { GeocoderClient, GeocodingResult, };

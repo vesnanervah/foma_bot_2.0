@@ -1,3 +1,4 @@
+import { GetReplyArgs } from "../baseCommandClient.js";
 import { BaseSimpleCommandClient } from "./baseSimpleCommandClient.js";
 
 const preludes = [
@@ -16,16 +17,19 @@ const preludes = [
 
 class WhoCommandClient extends BaseSimpleCommandClient {
     preludes = preludes;
+    triggerRegExp = /[а-я]?\s?кто|кому|кого/i;
 
-    whoCommandReply(commandArgument: string | undefined, members: Array<string>): string {
-        if(!commandArgument || commandArgument.length == 0) {
-            return 'Ты!';
+    getReply(args: GetReplyArgs) {
+        if(!args.commandArgument || args.commandArgument.length == 0) {
+            args.ctx?.reply('Ты!');
+            return;
         }
-        if (members.length < 3) {
-            return 'Я знаю еще слишком мало юзеров...Давайте знакомиться!';
+        if ((args.members?.length ?? 0) < 3) {
+            args.ctx?.reply('Я знаю еще слишком мало юзеров...Давайте знакомиться!');
+            return;
         }
-        const member = members[Math.floor(Math.random() * members.length)];
-        return `${this.getRandomPrelude()} ${member}`;
+        const member = args.members![Math.floor(Math.random() * args.members!.length)];
+        args.ctx?.reply(`${this.getRandomPrelude()} ${member}`);
     }
 }
 

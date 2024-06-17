@@ -1,11 +1,14 @@
 import { LocalStorage } from "node-localstorage";
+import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 
-class MembersLocalStorage {
+class MembersStorageClient extends BaseCommandClient{
+    triggerRegExp = /очистить мемберов/i;
     collectedMembersLocalStorageKey = 'members';
-    localStorage = new LocalStorage('../scratch');
+    localStorage = new LocalStorage('./scratch');
     collectedMembers: Array<string>;
 
     constructor() {
+        super();
         this.collectedMembers = this.getLocalCollectedMembers();
     }
 
@@ -18,8 +21,12 @@ class MembersLocalStorage {
         }
     }
 
+    getReply(args: GetReplyArgs) {
+        this.clearCollectedMembers();
+        args.ctx?.reply('Мемберы почищены...');
+    }
 
-    clearCollectedMembers() {
+    private clearCollectedMembers() {
         this.localStorage.removeItem(this.collectedMembersLocalStorageKey);
         this.collectedMembers = [];
     }
@@ -34,4 +41,4 @@ class MembersLocalStorage {
     }
 }
 
-export { MembersLocalStorage  };
+export { MembersStorageClient };

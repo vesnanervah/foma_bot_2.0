@@ -1,6 +1,8 @@
 import { UnknownCommandClient } from "./unknownCommandClient.js";
 
 class UnknownEnglishCommandClient extends UnknownCommandClient {
+    triggerRegExp = /[a-z]/i;
+
     constructor() {
         super();
         this.preludes = [

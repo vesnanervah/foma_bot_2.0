@@ -1,6 +1,9 @@
+import { GetReplyArgs } from "../baseCommandClient.js";
 import { BaseSimpleCommandClient } from "./baseSimpleCommandClient.js";
 
 class UnknownCommandClient extends BaseSimpleCommandClient {
+    triggerRegExp?: RegExp | undefined;
+    
     protected preludes: string[] = [
         'Меня твоя мама просила спросить: ты сколько раз в день зубы чистишь?',
         'Хм..я что-то туплю наверно...',
@@ -17,8 +20,8 @@ class UnknownCommandClient extends BaseSimpleCommandClient {
         'А ты в курсе, что мой хозяин потом читаеет всю ту ахинею, что ты тут пишешь, и угорает?'
     ];
 
-    unknownCommandReply():string {
-        return super.getRandomPrelude();
+    getReply(args: GetReplyArgs) {
+        args.ctx?.reply(super.getRandomPrelude());
     }
     
 }

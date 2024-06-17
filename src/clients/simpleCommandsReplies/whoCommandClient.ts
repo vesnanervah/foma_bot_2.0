@@ -17,7 +17,7 @@ const preludes = [
 
 class WhoCommandClient extends BaseSimpleCommandClient {
     preludes = preludes;
-    triggerRegExp = /[а-я]?\s?кто|кому|кого/i;
+    triggerRegExp = /кто|кому|кого/i;
 
     getReply(args: GetReplyArgs) {
         if(!args.commandArgument || args.commandArgument.length == 0) {

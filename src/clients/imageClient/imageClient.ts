@@ -4,6 +4,10 @@ import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 class ImageClient extends BaseCommandClient{
     triggerRegExp = /рсфср|шалаш/i;
 
+    isMatch(commandName: string, commandArgument?: string | undefined): boolean {
+        return this.triggerRegExp.test(commandName);
+    }
+
     async getReply(args: GetReplyArgs) {
         try{
             const url = await args.ctx!.telegram.getFileLink((args.ctx!.message.photo[1] ?? args.ctx!.message.photo[0]).file_id);

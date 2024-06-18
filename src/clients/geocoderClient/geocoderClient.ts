@@ -3,6 +3,7 @@ import { BaseCommandClient, GetReplyArgs } from '../baseCommandClient.js';
 
 
 class GeocoderClient extends BaseCommandClient{
+
     triggerRegExp = /координаты/i;
     private apiKey: string;
     private baseUrl = 'https://geocode-maps.yandex.ru/1.x';
@@ -11,6 +12,10 @@ class GeocoderClient extends BaseCommandClient{
     constructor(apiKey: string) {
         super();
         this.apiKey = apiKey;
+    }
+
+    isMatch(commandName: string, commandArgument?: string | undefined): boolean {
+        return this.triggerRegExp.test(commandName);
     }
 
     async getReply(args: GetReplyArgs) {

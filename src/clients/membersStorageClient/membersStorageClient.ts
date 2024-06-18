@@ -12,6 +12,10 @@ class MembersStorageClient extends BaseCommandClient{
         this.collectedMembers = this.getLocalCollectedMembers();
     }
 
+    isMatch(commandName: string, commandArgument?: string | undefined): boolean {
+        return this.triggerRegExp.test(commandName);
+    }
+
     addMember(member:string) {
         if (member && !this.collectedMembers.includes(member)) {
             // Костыль сбор всех участников тк в api бота мы не можем получить список участников

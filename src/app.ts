@@ -11,6 +11,7 @@ import { ImageClient } from "./clients/imageClient/imageClient.js";
 import { Message, Update } from "@telegraf/types";
 import { UnknownEnglishCommandClient } from "./clients/simpleCommandsReplies/unknownEnglishCommandClient.js";
 import { BaseCommandClient } from "./clients/baseCommandClient.js";
+import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
 
 class App {
     private isResponsing = false;
@@ -23,6 +24,7 @@ class App {
     private unknownEnglishCommandClient = new UnknownEnglishCommandClient();
     private whenCommandClient = new WhenCommandClient();
     private whoCommandnClient = new WhoCommandClient();
+    private profanitiesClient = new ProfanityCommandClient();
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,
         this.geocoder,
@@ -31,6 +33,7 @@ class App {
         this.unknownEnglishCommandClient,
         this.whenCommandClient,
         this.whoCommandnClient,
+        this.profanitiesClient,
     ];
 
     startApp() {
@@ -68,7 +71,7 @@ class App {
                 return
             }
             this.isResponsing = true;
-            var match = this.clients.find((client) => client.triggerRegExp != null && client.triggerRegExp.test(proccessResult!.commandName));
+            var match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
             if(match) {
                 match.getReply({
                     commandName: proccessResult.commandName,
@@ -93,7 +96,7 @@ class App {
                 return
             }
             this.isResponsing = true;
-            var match = this.clients.find((client) => client.triggerRegExp != null && client.triggerRegExp.test(proccessResult!.commandName));
+            var match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
             if(match) {
                 match.getReply({
                     commandName: proccessResult.commandName,

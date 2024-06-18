@@ -19,6 +19,10 @@ class WhoCommandClient extends BaseSimpleCommandClient {
     preludes = preludes;
     triggerRegExp = /кто|кому|кого/i;
 
+    isMatch(commandName: string, commandArgument?: string | undefined): boolean {
+        return this.triggerRegExp.test(commandName);
+    }
+
     getReply(args: GetReplyArgs) {
         if(!args.commandArgument || args.commandArgument.length == 0) {
             args.ctx?.reply('Ты!');

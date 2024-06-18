@@ -3,6 +3,10 @@ import { UnknownCommandClient } from "./unknownCommandClient.js";
 class UnknownEnglishCommandClient extends UnknownCommandClient {
     triggerRegExp = /[a-z]/i;
 
+    isMatch(commandName: string, commandArgument?: string | undefined): boolean {
+        return this.triggerRegExp.test(commandName);
+    }
+
     constructor() {
         super();
         this.preludes = [

@@ -23,6 +23,10 @@ class WeatherClient extends BaseCommandClient{
         this.apiKey = apiKey;
     }
 
+    isMatch(commandName: string, commandArgument?: string | undefined): boolean {
+        return this.triggerRegExp.test(commandName);
+    }
+
     async getReply(args: GetReplyArgs) {
         // TODO: хендл окончаний и более живых форматов вопросов
         if(!args.commandArgument || args.commandArgument.length === 0) {

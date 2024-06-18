@@ -2,9 +2,10 @@ import { Update } from "@telegraf/types";
 import { Context, NarrowedContext } from "telegraf";
 
 abstract class BaseCommandClient {
-    abstract triggerRegExp?: RegExp;
 
     abstract getReply(args: GetReplyArgs):void;
+
+    abstract isMatch(commandName: string, commandArgument?: string): boolean;
 }
 
 type GetReplyArgs<> = {

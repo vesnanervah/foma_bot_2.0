@@ -17,10 +17,11 @@ const preludes = [
 
 class WhoCommandClient extends BaseSimpleCommandClient {
     preludes = preludes;
-    triggerRegExp = /кто|кому|кого/i;
+    triggerRegExp = /кто|кому|кого|кем/i;
+    pretext = /у|для|c|да/i;
 
     isMatch(commandName: string, commandArgument?: string | undefined): boolean {
-        return this.triggerRegExp.test(commandName);
+        return this.triggerRegExp.test(this.pretext.test(commandName) ? (commandArgument?.split(' ')[0] ?? '')  : commandName);
     }
 
     getReply(args: GetReplyArgs) {

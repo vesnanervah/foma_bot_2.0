@@ -51,13 +51,15 @@ class ProfanityCommandClient extends BaseSimpleCommandClient {
         var sentence = [args.commandName, args.commandArgument ?? ''].join(' ');
         if (this.isFU(sentence)) {
             args.ctx?.reply(this.fUReplies[Math.floor(this.fUReplies.length * Math.random())]);
+            console.log('FU detected');
             return;
         }
         if(this.isInsult(sentence)) {
             args.ctx?.reply(this.insultsReply[Math.floor(this.insultsReply.length * Math.random())]);
+            console.log('insult detected');
             return;
         }
-        args.ctx?.reply(this.profanities[Math.floor(this.profanities.length * Math.random())]);
+        args.ctx?.reply(this.preludes[Math.floor(this.preludes.length * Math.random())]);
     }
 
     isMatch(commandName: string, commandArgument?: string | undefined): boolean {
@@ -67,9 +69,9 @@ class ProfanityCommandClient extends BaseSimpleCommandClient {
 
     private isInsult(sentence:string): boolean {
         const wordsArr = sentence.split(' ');
-        const hasYouWord = !!wordsArr.includes('ты');
+        const hasYouWord = wordsArr.includes('ты');
         if (hasYouWord) {
-            var youIndex = wordsArr.indexOf('ты');
+            let youIndex = wordsArr.indexOf('ты');
             return this.insults.includes(wordsArr[youIndex == 0 ? 1 : youIndex + 1]);
         }
         return !!this.insults.find((insult) => sentence.startsWith(insult));

@@ -1,4 +1,4 @@
-import got from "got";
+import got, { HTTPError } from "got";
 import { GeocoderClient, GeocodingResult } from "../geocoderClient/geocoderClient.js";
 import { GEOCODER_KEY } from "../../../token.js";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
@@ -43,16 +43,20 @@ class WeatherClient extends BaseCommandClient{
     }
 
     private async getCurrentWeather(geocoding: GeocodingResult, cityName: string): Promise<string> {
-        var finalUrl = this.getFinalUrl(geocoding);
-        var response = await got.get(finalUrl);
-        if (response.statusCode !== 200 || !response.body) {
-            return 'Не получилось побазарить с сервером';
+        try {
+            var finalUrl = this.getFinalUrl(geocoding);
+            var response = await got.get(finalUrl);
+            if (response.statusCode !== 200 || !response.body) {
+                return 'Не получилось побазарить с сервером';
+            }
+            var result = JSON.parse(response.body)['current'] as CurrentWeather | undefined;
+            if(!result || !result.temp_c || !result.wind_kph) {
+                return 'Сервак отправил какую-то хуйнню';
+            }
+            return this.getWeatherString(result, cityName);
+        } catch(error) {
+            return 'Что-то пошло не так';
         }
-        var result = JSON.parse(response.body)['current'] as CurrentWeather | undefined;
-        if(!result || !result.temp_c || !result.wind_kph) {
-            return 'Сервак отправил какую-то хуйнню';
-        }
-        return this.getWeatherString(result, cityName);
     }
 
     private getFinalUrl(geocoding: GeocodingResult): string {

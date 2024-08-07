@@ -11,7 +11,7 @@ class UnknownEnglishCommandClient extends UnknownCommandClient {
         super();
         this.preludes = [
             ...this.preludes,
-            'Ах, еслл бы я понимал латиицу...да, бы был поистине умен))',
+            'Ах, еслл бы я понимал латиницу...да, бы был поистине умен))',
             'I can\'t really say that i speak English just as fluently as the person that told me to say this after your strange phrases starting with latin letters))',
             'Может, будем болтать по-русски?',
         ]

@@ -20,18 +20,24 @@ class ImageClient extends BaseCommandClient{
     }
 
     private async getRcfcr(url: string): Promise<Buffer> {
-        var srcImg = await Jimp.read(url);
-        var cloneImg = srcImg.clone().mirror(true, false).crop(srcImg.getWidth() / 2, 0, srcImg.getWidth() / 2, srcImg.getHeight());
+        const srcImg = await Jimp.read(url);
+        const isEvenWidth = srcImg.getWidth() % 2 == 0;
+        const cropX = isEvenWidth ? srcImg.getWidth() / 2 : (srcImg.getWidth() - 1) / 2;
+        const cropWidth = isEvenWidth ? srcImg.getWidth() / 2 : (srcImg.getWidth() + 1) / 2;
+        const cloneImg = srcImg.clone().mirror(true, false).crop(cropX, 0, cropWidth, srcImg.getHeight());
         srcImg.composite(cloneImg, srcImg.getWidth() / 2, 0);
-        var bufferedImg = await srcImg.getBufferAsync(Jimp.MIME_JPEG);
+        const bufferedImg = await srcImg.getBufferAsync(Jimp.MIME_JPEG);
         return bufferedImg;
     }
 
     private async getShalash(url: string): Promise<Buffer> {
-        var srcImg = await Jimp.read(url);
-        var cloneImg = srcImg.clone().crop(srcImg.getWidth() / 2, 0, srcImg.getWidth() / 2, srcImg.getHeight());
+        const srcImg = await Jimp.read(url);
+        const isEvenWidth = srcImg.getWidth() % 2 == 0;
+        const cropX = isEvenWidth ? srcImg.getWidth() / 2 : (srcImg.getWidth() - 1) / 2;
+        const cropWidth = isEvenWidth ? srcImg.getWidth() / 2 : (srcImg.getWidth() + 1) / 2;
+        const cloneImg = srcImg.clone().crop(cropX, 0, cropWidth, srcImg.getHeight());
         srcImg.mirror(true, false).composite(cloneImg, srcImg.getWidth() / 2, 0);
-        var bufferedImg = await srcImg.getBufferAsync(Jimp.MIME_JPEG);
+        const bufferedImg = await srcImg.getBufferAsync(Jimp.MIME_JPEG);
         return bufferedImg;
     }
 }

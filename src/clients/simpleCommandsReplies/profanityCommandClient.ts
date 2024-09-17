@@ -51,12 +51,10 @@ class ProfanityCommandClient extends BaseSimpleCommandClient {
         var sentence = [args.commandName, args.commandArgument ?? ''].join(' ');
         if (this.isFU(sentence)) {
             args.ctx?.reply(this.fUReplies[Math.floor(this.fUReplies.length * Math.random())]);
-            console.log('FU detected');
             return;
         }
         if(this.isInsult(sentence)) {
             args.ctx?.reply(this.insultsReply[Math.floor(this.insultsReply.length * Math.random())]);
-            console.log('insult detected');
             return;
         }
         args.ctx?.reply(this.preludes[Math.floor(this.preludes.length * Math.random())]);

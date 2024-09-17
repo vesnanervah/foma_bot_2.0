@@ -1,5 +1,7 @@
 import {got } from 'got'
 import { BaseCommandClient, GetReplyArgs } from '../baseCommandClient.js';
+import { GeocodingResult } from './entities/geocodingResult.js';
+import { GeocoderResponse } from './entities/geocoderResponse.js';
 
 
 class GeocoderClient extends BaseCommandClient{
@@ -23,14 +25,13 @@ class GeocoderClient extends BaseCommandClient{
             args.ctx?.reply('А город я угадать должен?');
             return
         }
-        var response = await this.getCityCoordinates(args.commandArgument!);
+        const response = await this.getCityCoordinates(args.commandArgument!);
         args.ctx?.reply(response.success ? `Координаты места ${args.commandArgument!}: широта ${response.latitude}, долгота ${response.longitude}` : (response.errorMessage ?? 'Незахендленный ерор. Еблан керик хуйни накодил.'));
     }
 
     async getCityCoordinates(cityName: string): Promise<GeocodingResult> {
-        var url = this.getFinalUrl(cityName)
+        const url = this.getFinalUrl(cityName)
         const response = await got.get(url);
-        console.log(response);
         if (response.statusCode == 200) {
             var result = JSON.parse(response.body) as GeocoderResponse;
             if (result.response.GeoObjectCollection?.metaDataProperty?.GeocoderResponseMetaData?.found == "0" ?? true) {
@@ -50,50 +51,4 @@ class GeocoderClient extends BaseCommandClient{
     }
 }
 
-class GeocodingResult {
-    success: boolean;
-    longitude?: string;
-    latitude?: string;
-    errorMessage?: string;
-
-    // После полугода работы на дарте я забыл синтаксис тайпскрипта...
-    constructor (args:GeoCodingResultArgs) {
-        this.success = args.success;
-        this.latitude = args.latitude;
-        this.longitude = args.longitude;
-    }
-}
- type GeoCodingResultArgs = {
-    success: boolean;
-    longitude?: string;
-    latitude?: string;
-    errorMessage?: string;
- }
-
-type GeocoderResponse = {
-    response: {
-        GeoObjectCollection: {
-            metaDataProperty: {
-                GeocoderResponseMetaData: {
-                    request: string,
-                    results: string,
-                    found: string,
-                },
-            },
-            featureMember: Array<YandexGeoObject>,
-        }
-    }
-}
-
-type YandexGeoObject = {
-    GeoObject: {
-        name: string,
-        description: string,
-        Point: {
-            pos: string,
-        }
-    }
-}
-
-
-export { GeocoderClient, GeocodingResult, };
+export { GeocoderClient };

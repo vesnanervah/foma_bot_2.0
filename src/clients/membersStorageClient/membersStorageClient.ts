@@ -21,7 +21,6 @@ class MembersStorageClient extends BaseCommandClient{
             // Костыль сбор всех участников тк в api бота мы не можем получить список участников
             this.collectedMembers.push(member);
             this.localStorage.setItem(this.collectedMembersLocalStorageKey, JSON.stringify(this.collectedMembers));
-            console.log(this.collectedMembers);
         }
     }
 
@@ -36,7 +35,7 @@ class MembersStorageClient extends BaseCommandClient{
     }
 
     private getLocalCollectedMembers(): Array<string>{
-        var savedMembers = this.localStorage.getItem(this.collectedMembersLocalStorageKey);
+        const savedMembers = this.localStorage.getItem(this.collectedMembersLocalStorageKey);
         if (savedMembers) {
             console.log('Got members from local');
             return JSON.parse(savedMembers);

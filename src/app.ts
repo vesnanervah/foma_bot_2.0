@@ -8,7 +8,7 @@ import { MembersStorageClient } from "./clients/membersStorageClient/membersStor
 import { UnknownCommandClient } from "./clients/simpleCommandsReplies/unknownCommandClient.js";
 import { WhenCommandClient } from "./clients/simpleCommandsReplies/whenCommandClient.js";
 import { ImageClient } from "./clients/imageClient/imageClient.js";
-import { Message, Update } from "@telegraf/types";
+import { Update } from "@telegraf/types";
 import { UnknownEnglishCommandClient } from "./clients/simpleCommandsReplies/unknownEnglishCommandClient.js";
 import { BaseCommandClient } from "./clients/baseCommandClient.js";
 import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
@@ -45,7 +45,7 @@ class App {
     }
 
     private startCommandProccess(ctx: NarrowedContext<Context<Update>, Update.MessageUpdate<any>>, message: string): CommandProccessResult | undefined {
-        var sender = [ctx.update.message.from.first_name, (ctx.update.message.from.last_name ?? '')].join(' ').trim();
+        const sender = [ctx.update.message.from.first_name, (ctx.update.message.from.last_name ?? '')].join(' ').trim();
         this.membersStorageClient.addMember(sender);
         if(!message.toLowerCase().startsWith('фома, ')) {
             return;
@@ -53,9 +53,9 @@ class App {
         if(this.isResponsing) {
             return;
         }
-        var command = message.slice(message.indexOf(',') + 1).trim();
-        var commandName = command.split(' ')[0].toLowerCase();
-        var commandArgument = command.split(' ').slice(1).join(' ');
+        const command = message.slice(message.indexOf(',') + 1).trim();
+        const commandName = command.split(' ')[0].toLowerCase();
+        const commandArgument = command.split(' ').slice(1).join(' ');
         console.log('Incoming command: ' + commandName);
         console.log('Incoming argument: ' + commandArgument);
         return {
@@ -96,7 +96,7 @@ class App {
                 return
             }
             this.isResponsing = true;
-            var match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
+            const match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
             if(match) {
                 match.getReply({
                     commandName: proccessResult.commandName,

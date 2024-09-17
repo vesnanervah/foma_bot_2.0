@@ -1,7 +1,9 @@
-import got, { HTTPError } from "got";
-import { GeocoderClient, GeocodingResult } from "../geocoderClient/geocoderClient.js";
+import got from "got";
+import { GeocoderClient } from "../geocoderClient/geocoderClient.js";
 import { GEOCODER_KEY } from "../../../token.js";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
+import { GeocodingResult } from "../geocoderClient/entities/geocodingResult.js";
+import { CurrentWeather } from "./entities/currentWeather.js";
 
 
 const aboutHotTemperature = ['лютая жара', 'просто Вьетнам', 'настоящее пекло', 'невыносимо жарко', 'можно стать негром'];
@@ -33,23 +35,23 @@ class WeatherClient extends BaseCommandClient{
              args.ctx?.reply('где именно то')
              return
         }
-        var geocodingResult = await this.geocoder.getCityCoordinates(args.commandArgument!);
+        const geocodingResult = await this.geocoder.getCityCoordinates(args.commandArgument!);
         if (!geocodingResult.success ) {
             args.ctx?.reply(geocodingResult.errorMessage ??  'Незахендленный ерор. Еблан керик хуйни накодил.');
             return
         }
-        var currentWeather = await this.getCurrentWeather(geocodingResult, args.commandArgument!);
+        const currentWeather = await this.getCurrentWeather(geocodingResult, args.commandArgument!);
         args.ctx?.reply(currentWeather);
     }
 
     private async getCurrentWeather(geocoding: GeocodingResult, cityName: string): Promise<string> {
         try {
-            var finalUrl = this.getFinalUrl(geocoding);
-            var response = await got.get(finalUrl);
+            const finalUrl = this.getFinalUrl(geocoding);
+            const response = await got.get(finalUrl);
             if (response.statusCode !== 200 || !response.body) {
                 return 'Не получилось побазарить с сервером';
             }
-            var result = JSON.parse(response.body)['current'] as CurrentWeather | undefined;
+            const result = JSON.parse(response.body)['current'] as CurrentWeather | undefined;
             if(!result || !result.temp_c || !result.wind_kph) {
                 return 'Сервак отправил какую-то хуйнню';
             }
@@ -87,11 +89,4 @@ class WeatherClient extends BaseCommandClient{
 }
 
 
-
-type CurrentWeather = {
-    temp_c: number,
-    wind_kph: number,
-    humidity: number,
-}
-
-export {WeatherClient, CurrentWeather,}
+export { WeatherClient };

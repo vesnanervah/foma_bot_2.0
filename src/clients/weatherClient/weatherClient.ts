@@ -30,17 +30,24 @@ class WeatherClient extends BaseCommandClient{
     }
 
     async getReply(args: GetReplyArgs) {
-        // TODO: хендл окончаний и более живых форматов вопросов
         if(!args.commandArgument || args.commandArgument.length === 0) {
              args.ctx?.reply('где именно то')
              return
         }
-        const geocodingResult = await this.geocoder.getCityCoordinates(args.commandArgument!);
+        const isSeveralWords = args.commandArgument.split(' ').length > 1;
+        let cityName = args.commandArgument;
+        if(isSeveralWords) {
+            const hasPrefix = /в/i.test(args.commandArgument.split(' ')[0]);
+            if(hasPrefix) {
+                cityName = args.commandArgument.split(' ').slice(1).join(' ');
+            }
+        }
+        const geocodingResult = await this.geocoder.getCityCoordinates(cityName!);
         if (!geocodingResult.success ) {
             args.ctx?.reply(geocodingResult.errorMessage ??  'Незахендленный ерор. Еблан керик хуйни накодил.');
             return
         }
-        const currentWeather = await this.getCurrentWeather(geocodingResult, args.commandArgument!);
+        const currentWeather = await this.getCurrentWeather(geocodingResult, cityName!);
         args.ctx?.reply(currentWeather);
     }
 

@@ -6,6 +6,10 @@ abstract class BaseCommandClient {
     abstract getReply(args: GetReplyArgs):void;
 
     abstract isMatch(commandName: string, commandArgument?: string): boolean;
+
+    getRandomValueFromArray( arr:Array<string> ): string {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
 }
 
 type GetReplyArgs<> = {

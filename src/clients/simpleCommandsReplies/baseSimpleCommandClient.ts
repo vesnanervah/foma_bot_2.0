@@ -5,7 +5,7 @@ abstract class BaseSimpleCommandClient extends BaseCommandClient{
 
     
     protected getRandomPrelude(): string {
-        return this.preludes[Math.floor(this.preludes.length * Math.random())];
+        return this.getRandomValueFromArray(this.preludes);
     }
 }
 

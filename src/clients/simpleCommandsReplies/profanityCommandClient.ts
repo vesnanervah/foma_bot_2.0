@@ -50,14 +50,14 @@ class ProfanityCommandClient extends BaseSimpleCommandClient {
     getReply(args: GetReplyArgs): void {
         var sentence = [args.commandName, args.commandArgument ?? ''].join(' ');
         if (this.isFU(sentence)) {
-            args.ctx?.reply(this.fUReplies[Math.floor(this.fUReplies.length * Math.random())]);
+            args.ctx?.reply(this.getRandomValueFromArray(this.fUReplies));
             return;
         }
         if(this.isInsult(sentence)) {
-            args.ctx?.reply(this.insultsReply[Math.floor(this.insultsReply.length * Math.random())]);
+            args.ctx?.reply(this.getRandomValueFromArray(this.insultsReply));
             return;
         }
-        args.ctx?.reply(this.preludes[Math.floor(this.preludes.length * Math.random())]);
+        args.ctx?.reply(this.getRandomPrelude());
     }
 
     isMatch(commandName: string, commandArgument?: string | undefined): boolean {

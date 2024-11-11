@@ -30,19 +30,26 @@ class GeocoderClient extends BaseCommandClient{
     }
 
     async getCityCoordinates(cityName: string): Promise<GeocodingResult> {
-        const url = this.getFinalUrl(cityName)
-        const response = await got.get(url);
-        if (response.statusCode == 200) {
-            var result = JSON.parse(response.body) as GeocoderResponse;
-            if (result.response.GeoObjectCollection?.metaDataProperty?.GeocoderResponseMetaData?.found == "0" ?? true) {
-                return new GeocodingResult({success: false, errorMessage: 'Че за хуйню ты написал? Я не могу найти такое место.'});
+        const url = this.getFinalUrl(cityName);
+        try {
+            const response = await got.get(url);
+            if (response.statusCode == 200) {
+                var result = JSON.parse(response.body) as GeocoderResponse;
+                if (result.response.GeoObjectCollection?.metaDataProperty?.GeocoderResponseMetaData?.found == "0" ?? true) {
+                    return new GeocodingResult({success: false, errorMessage: 'Че за хуйню ты написал? Я не могу найти такое место.'});
+                }
+                var [longitude, latutide] =result.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
+                return new GeocodingResult({success: true, latitude: latutide, longitude: longitude});
             }
-            var [longitude, latutide] =result.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
-            return new GeocodingResult({success: true, latitude: latutide, longitude: longitude});
+        } catch {
+            return new GeocodingResult({
+                success: false,
+                errorMessage: 'Какая-то ебанина с серваком яндекса. Керил посмотри логи.'
+            });
         }
         return new GeocodingResult({
             success: false,
-            errorMessage: 'Какая-то ебанина с серваком яндекса. Керил посмотри логи.'
+            errorMessage: 'Не могу получить координаты'
         });
     }
 

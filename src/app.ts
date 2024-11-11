@@ -27,8 +27,10 @@ class App {
     private profanitiesClient = new ProfanityCommandClient();
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,
-        this.geocoder,
-        this.weatherClient,
+
+        // TODO: Yandex blacklisted me in their geo api, so i need to find replacement
+        // this.geocoder,
+        // this.weatherClient,
         this.imageClient,
         this.unknownEnglishCommandClient,
         this.whenCommandClient,

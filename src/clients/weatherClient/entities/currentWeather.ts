@@ -1,7 +1,7 @@
 type CurrentWeather = {
-    temp_c: number,
-    wind_kph: number,
-    humidity: number,
+    temp_c?: number | null,
+    wind_kph?: number | null,
+    humidity?: number | null,
 }
 
 export { CurrentWeather };

@@ -59,7 +59,7 @@ class WeatherClient extends BaseCommandClient{
                 return 'Не получилось побазарить с сервером';
             }
             const result = JSON.parse(response.body)['current'] as CurrentWeather | undefined;
-            if(!result || !result.temp_c || !result.wind_kph) {
+            if(!result || (!result.temp_c && result.temp_c !=0)) {
                 return 'Сервак отправил какую-то хуйнню';
             }
             return this.getWeatherString(result, cityName);
@@ -73,9 +73,10 @@ class WeatherClient extends BaseCommandClient{
     }
 
     private getWeatherString(weather: CurrentWeather, cityName: string) {
-        const wind_mpm = Math.round(weather.wind_kph /3.6);
-
-        return `В локации ${cityName} сейчас ${this.getAboutTemperatureString(weather.temp_c)}: ${weather.temp_c}°С. Скорость ветра достигает ${wind_mpm}м/с. Влажность воздуха составляет: ${weather.humidity}`;
+        const wind_mpm = weather.wind_kph || weather.wind_kph == 0 ?  Math.round(weather.wind_kph! /3.6) : null;
+        return `В локации ${cityName} сейчас ${this.getAboutTemperatureString(weather.temp_c!)}: ${weather.temp_c}°С.` +
+         (wind_mpm || wind_mpm == 0  ? `Скорость ветра достигает ${wind_mpm}м/с. ` : '' ) + 
+         (weather.humidity ||  weather.humidity == 0 ?  `Влажность воздуха составляет: ${weather.humidity};` : '')
     }
 
     private getAboutTemperatureString(temp: number) : string {

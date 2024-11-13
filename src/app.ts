@@ -18,8 +18,8 @@ class App {
     private bot = new Telegraf(TG_TOKEN);
     private unknownCommandClient = new UnknownCommandClient();
     private membersStorageClient = new MembersStorageClient();
-    // private geocoder = new GeocoderClient(GEOCODER_KEY);
-    // private weatherClient = new WeatherClient(WEATHER_KEY);
+    private geocoder = new GeocoderClient(GEOCODER_KEY);
+    private weatherClient = new WeatherClient(WEATHER_KEY);
     private imageClient = new ImageClient();
     private unknownEnglishCommandClient = new UnknownEnglishCommandClient();
     private whenCommandClient = new WhenCommandClient();
@@ -27,10 +27,8 @@ class App {
     private profanitiesClient = new ProfanityCommandClient();
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,
-
-        // TODO: Yandex blacklisted me in their geo api, so i need to find replacement
-        // this.geocoder,
-        // this.weatherClient,
+        this.geocoder,
+        this.weatherClient,
         this.imageClient,
         this.unknownEnglishCommandClient,
         this.whenCommandClient,

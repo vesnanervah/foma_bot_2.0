@@ -1,5 +1,4 @@
 import { Context, NarrowedContext, Telegraf } from "telegraf";
-import { GEOCODER_KEY, TG_TOKEN, WEATHER_KEY } from "../token.js";
 import { GeocoderClient } from "./clients/geocoderClient/geocoderClient.js";
 import { WeatherClient } from "./clients/weatherClient/weatherClient.js";
 import { WhoCommandClient } from "./clients/simpleCommandsReplies/whoCommandClient.js";
@@ -12,14 +11,15 @@ import { Update } from "@telegraf/types";
 import { UnknownEnglishCommandClient } from "./clients/simpleCommandsReplies/unknownEnglishCommandClient.js";
 import { BaseCommandClient } from "./clients/baseCommandClient.js";
 import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
+require('dotenv').config()
 
 class App {
     private isResponsing = false;
-    private bot = new Telegraf(TG_TOKEN);
+    private bot = new Telegraf(process.env.TG_TOKEN!);
     private unknownCommandClient = new UnknownCommandClient();
     private membersStorageClient = new MembersStorageClient();
-    private geocoder = new GeocoderClient(GEOCODER_KEY);
-    private weatherClient = new WeatherClient(WEATHER_KEY);
+    private geocoder = new GeocoderClient(process.env.GEOCODER_KEY!);
+    private weatherClient = new WeatherClient(process.env.WEATHER_KEY!);
     private imageClient = new ImageClient();
     private unknownEnglishCommandClient = new UnknownEnglishCommandClient();
     private whenCommandClient = new WhenCommandClient();

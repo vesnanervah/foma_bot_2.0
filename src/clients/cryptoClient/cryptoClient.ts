@@ -5,8 +5,8 @@ import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 class CryptoClient extends BaseCommandClient {
     private baseUrl = 'https://api.coinpaprika.com/v1';
     private triggerRegExp = /стоимость/i;
-    private dogeRegExp = /^доги[чи,коин,коины]*/i
-    private bitcoinRegExp = /^бит[ок, коин, коины]*/i
+    private dogeRegExp = /^доги((чи)|(коины?))?$/i
+    private bitcoinRegExp = /^бит((ок)|(коины?))$/i
     private coinIds: RegExpIds  = {
         'doge-dogecoin': this.dogeRegExp,
         'btc-bitcoin': this.bitcoinRegExp,

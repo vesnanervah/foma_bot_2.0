@@ -6,7 +6,7 @@ import { GeocoderResponse } from './entities/geocoderResponse.js';
 
 class GeocoderClient extends BaseCommandClient{
 
-    triggerRegExp = /координаты/i;
+    triggerRegExp = /^координаты/i;
     private apiKey: string;
     private baseUrl = 'https://geocode-maps.yandex.ru/1.x';
 

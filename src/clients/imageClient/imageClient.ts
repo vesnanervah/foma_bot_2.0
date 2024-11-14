@@ -2,7 +2,7 @@ import Jimp from "jimp";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 
 class ImageClient extends BaseCommandClient{
-    triggerRegExp = /рсфср|шалаш/i;
+    triggerRegExp = /^рсфср|шалаш/i;
 
     isMatch(commandName: string, commandArgument?: string | undefined): boolean {
         return this.triggerRegExp.test(commandName);

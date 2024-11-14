@@ -13,6 +13,7 @@ import { UnknownEnglishCommandClient } from "./clients/simpleCommandsReplies/unk
 import { BaseCommandClient } from "./clients/baseCommandClient.js";
 import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
 import { CryptoClient } from "./clients/cryptoClient/cryptoClient.js";
+import { IntervalCommandClient } from "./clients/intervalCommandClient.js";
 
 class App {
     private isResponsing = false;
@@ -38,10 +39,14 @@ class App {
         this.profanitiesClient,
         this.cryptoClient,
     ];
+    private intervalClients: Array<IntervalCommandClient> = [
+        this.cryptoClient,
+    ];
 
     startApp() {
         this.addTextSubscribtion();
         this.addPhotoSubscribtion();
+        this.addIntevalSubscribtion();
         this.bot.launch();
         console.log('Фома 2.0 начал работу');
         setInterval(() => console.log('Bot is online'), 100000);
@@ -114,6 +119,19 @@ class App {
                 })
             }
             this.isResponsing = false;
+          });
+    }
+
+    private addIntevalSubscribtion() {
+
+        // TODO: optimize unneccesary calls and iterations
+        this.bot.on(message('text'), async(ctx) => {
+            this.intervalClients.forEach((client) => {
+                if(client.chatContext === undefined) {
+                    client.chatContext = ctx;
+                    client.startIntervalSubscribtions();
+                }
+            });
           });
     }
 }

@@ -7,7 +7,7 @@ abstract class BaseCommandClient {
 
     abstract isMatch(commandName: string, commandArgument?: string): boolean;
 
-    getRandomValueFromArray( arr:Array<string> ): string {
+    getRandomValueFromArray<T>( arr:Array<T> ): T {
         return arr[Math.floor(Math.random() * arr.length)];
     }
 }

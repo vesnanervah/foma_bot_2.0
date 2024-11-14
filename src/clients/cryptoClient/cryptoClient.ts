@@ -1,8 +1,9 @@
 import got from "got";
-import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
+import { GetReplyArgs } from "../baseCommandClient.js";
+import { IntervalCommandClient } from "../intervalCommandClient.js";
 
 
-class CryptoClient extends BaseCommandClient {
+class CryptoClient extends IntervalCommandClient {
     private baseUrl = 'https://api.coinpaprika.com/v1';
     private triggerRegExp = /стоимость|курс|пачем$/i;
     private dogeRegExp = /^доги((чи)|(коины?))?$/i
@@ -19,6 +20,10 @@ class CryptoClient extends BaseCommandClient {
 
     isMatch(commandName: string, commandArgument?: string | undefined): boolean {
         return this.triggerRegExp.test(commandName);
+    }
+
+    startIntervalSubscribtions(): void {
+        this.setIntervalToRandomPrediction();
     }
 
     private async getOhlcv(commandArgument?: string | undefined)  {
@@ -74,6 +79,21 @@ class CryptoClient extends BaseCommandClient {
 
     private countDifferenceInPercentage(bigger: number, smaller: number): number {
         return 100 * (bigger - smaller) / bigger;
+    }
+
+    private async setIntervalToRandomPrediction(): Promise<void> {
+        await this.startIntervalCommand(async () => {
+            if(this.chatContext == null) {
+                return
+            }
+            const randomCoin = this.getRandomCoin();
+            const result = await this.getOhlcv(randomCoin);
+            await this.chatContext.sendMessage(result);
+        });
+    }
+
+    private getRandomCoin(): string {
+        return this.getRandomValueFromArray(Object.keys(this.coinIds));
     }
 }
 

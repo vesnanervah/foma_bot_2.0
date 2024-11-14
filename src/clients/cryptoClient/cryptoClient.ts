@@ -6,11 +6,15 @@ import { IntervalCommandClient } from "../intervalCommandClient.js";
 class CryptoClient extends IntervalCommandClient {
     private baseUrl = 'https://api.coinpaprika.com/v1';
     private triggerRegExp = /стоимость|курс|пачем$/i;
-    private dogeRegExp = /^доги((чи)|(коины?))?$/i
-    private bitcoinRegExp = /^бит((ок)|(коины?))$/i
+    private dogeRegExp = /^доги((чи)|(коины?))?$/i;
+    private bitcoinRegExp = /^бит((ок)|(коины?))$/i;
+    private toncoinRegExp = /^тон(коин)?$/i;
+    private notcoinRegExp = /^нот(коин)?$/i;
     private coinIds: RegExpIds  = {
         'doge-dogecoin': this.dogeRegExp,
         'btc-bitcoin': this.bitcoinRegExp,
+        'toncoin-the-open-network': this.toncoinRegExp,
+        'not-notcoin': this.notcoinRegExp,
     }
 
     async getReply(args: GetReplyArgs): Promise<void> {

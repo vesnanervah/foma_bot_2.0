@@ -29,11 +29,11 @@ class CryptoClient extends BaseCommandClient {
         if(!coinId) {
             return 'Я не знаю такого коина';
         }
-        const url = `${this.baseUrl}/coins${coinId}/ohlcv/latest/`;
+        const url = `${this.baseUrl}/coins/${coinId}/ohlcv/latest/`;
         try {
             const response = await got.get(url);
-            const ohlc = response.body as Ohlc;
-            if (ohlc.open) {
+            const ohlc = (JSON.parse(response.body) as Array<Ohlc>)[0] as Ohlc | undefined;
+            if (ohlc?.open) {
                 return this.generateOhlcvAnswer(ohlc, commandArgument);
             }
             return 'В этой жизни что-то пошло не так'    
@@ -89,3 +89,5 @@ type Ohlc = {
     volume?: number |null,
     market_cap?: number |null,
 }
+
+export { CryptoClient };

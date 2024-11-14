@@ -12,6 +12,7 @@ import { Update } from "@telegraf/types";
 import { UnknownEnglishCommandClient } from "./clients/simpleCommandsReplies/unknownEnglishCommandClient.js";
 import { BaseCommandClient } from "./clients/baseCommandClient.js";
 import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
+import { CryptoClient } from "./clients/cryptoClient/cryptoClient.js";
 
 class App {
     private isResponsing = false;
@@ -20,6 +21,7 @@ class App {
     private membersStorageClient = new MembersStorageClient();
     private geocoder = new GeocoderClient(GEOCODER_KEY);
     private weatherClient = new WeatherClient(WEATHER_KEY);
+    private cryptoClient = new CryptoClient();
     private imageClient = new ImageClient();
     private unknownEnglishCommandClient = new UnknownEnglishCommandClient();
     private whenCommandClient = new WhenCommandClient();
@@ -34,6 +36,7 @@ class App {
         this.whenCommandClient,
         this.whoCommandnClient,
         this.profanitiesClient,
+        this.cryptoClient,
     ];
 
     startApp() {

@@ -14,7 +14,7 @@ abstract class IntervalCommandClient extends BaseCommandClient {
     }
 
     protected getRandomInterval(): number {
-        return Math.floor(this.getRandomValueFromArray<number>([1000, 10000, 100000, 1000000]) * Math.random())
+        return Math.floor(this.getRandomValueFromArray<number>([10000, 100000, 1000000, 10000000]) * Math.random())
     }
 }
 

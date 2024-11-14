@@ -14,7 +14,7 @@ class CryptoClient extends IntervalCommandClient {
     }
 
     async getReply(args: GetReplyArgs): Promise<void> {
-        const response = await this.getOhlcv(args.commandArgument);
+        const response = await this.getOhlcvFromSuggest(args.commandArgument);
         args.ctx?.reply(response);
     }
 
@@ -26,20 +26,24 @@ class CryptoClient extends IntervalCommandClient {
         this.setIntervalToRandomPrediction();
     }
 
-    private async getOhlcv(commandArgument?: string | undefined)  {
-        if(!commandArgument) {
+    private async getOhlcvFromSuggest(suggest?: string) {
+        if(!suggest) {
             return 'Каво';
         }
-        const coinId = this.getCoinId(commandArgument);
+        const coinId = this.getCoinId(suggest);
         if(!coinId) {
             return 'Я не знаю такого коина';
         }
+        return await this.getOhlcv(coinId, suggest);
+    }
+
+    private async getOhlcv(coinId: string, coinName: string)  {
         const url = `${this.baseUrl}/coins/${coinId}/ohlcv/latest/`;
         try {
             const response = await got.get(url);
             const ohlc = (JSON.parse(response.body) as Array<Ohlc>)[0] as Ohlc | undefined;
             if (ohlc?.open) {
-                return this.generateOhlcvAnswer(ohlc, commandArgument);
+                return this.generateOhlcvAnswer(ohlc, coinName);
             }
             return 'В этой жизни что-то пошло не так'    
         } catch {
@@ -87,7 +91,7 @@ class CryptoClient extends IntervalCommandClient {
                 return
             }
             const randomCoin = this.getRandomCoin();
-            const result = await this.getOhlcv(randomCoin);
+            const result = await this.getOhlcv(randomCoin, randomCoin);
             await this.chatContext.sendMessage(result);
         });
     }

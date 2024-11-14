@@ -46,7 +46,6 @@ class App {
     startApp() {
         this.addTextSubscribtion();
         this.addPhotoSubscribtion();
-        this.addIntevalSubscribtion();
         this.bot.launch();
         console.log('Фома 2.0 начал работу');
         setInterval(() => console.log('Bot is online'), 100000);
@@ -74,6 +73,14 @@ class App {
 
     private addTextSubscribtion() {
         this.bot.on(message('text'), async (ctx) => {
+            // TODO: split
+            this.intervalClients.forEach((client) => {
+                if(client.chatContext === undefined) {
+                    client.chatContext = ctx;
+                    client.startIntervalSubscribtions();
+                }
+            });
+            
             var proccessResult = this.startCommandProccess(ctx, ctx.message.text);
             if(!proccessResult) {
                 return
@@ -119,19 +126,6 @@ class App {
                 })
             }
             this.isResponsing = false;
-          });
-    }
-
-    private addIntevalSubscribtion() {
-
-        // TODO: optimize unneccesary calls and iterations
-        this.bot.on(message('text'), async(ctx) => {
-            this.intervalClients.forEach((client) => {
-                if(client.chatContext === undefined) {
-                    client.chatContext = ctx;
-                    client.startIntervalSubscribtions();
-                }
-            });
           });
     }
 }

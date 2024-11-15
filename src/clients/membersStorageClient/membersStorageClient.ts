@@ -2,7 +2,7 @@ import { LocalStorage } from "node-localstorage";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 
 class MembersStorageClient extends BaseCommandClient{
-    triggerRegExp = /очистить мемберов/i;
+    triggerRegExp = /^очистить мемберов$/i;
     collectedMembersLocalStorageKey = 'members';
     localStorage = new LocalStorage('./scratch');
     collectedMembers: Array<string>;

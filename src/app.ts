@@ -12,6 +12,8 @@ import { Update } from "@telegraf/types";
 import { UnknownEnglishCommandClient } from "./clients/simpleCommandsReplies/unknownEnglishCommandClient.js";
 import { BaseCommandClient } from "./clients/baseCommandClient.js";
 import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
+import { CryptoClient } from "./clients/cryptoClient/cryptoClient.js";
+import { IntervalCommandClient } from "./clients/intervalCommandClient.js";
 
 class App {
     private isResponsing = false;
@@ -20,11 +22,13 @@ class App {
     private membersStorageClient = new MembersStorageClient();
     private geocoder = new GeocoderClient(GEOCODER_KEY);
     private weatherClient = new WeatherClient(WEATHER_KEY);
+    private cryptoClient = new CryptoClient();
     private imageClient = new ImageClient();
     private unknownEnglishCommandClient = new UnknownEnglishCommandClient();
     private whenCommandClient = new WhenCommandClient();
     private whoCommandnClient = new WhoCommandClient();
     private profanitiesClient = new ProfanityCommandClient();
+    private intervalClientsSubscribed = false;
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,
         this.geocoder,
@@ -34,6 +38,10 @@ class App {
         this.whenCommandClient,
         this.whoCommandnClient,
         this.profanitiesClient,
+        this.cryptoClient,
+    ];
+    private intervalClients: Array<IntervalCommandClient> = [
+        this.cryptoClient,
     ];
 
     startApp() {
@@ -66,6 +74,9 @@ class App {
 
     private addTextSubscribtion() {
         this.bot.on(message('text'), async (ctx) => {
+            if(!this.intervalClientsSubscribed)
+            this.subsribeIntervalClients(ctx);
+
             var proccessResult = this.startCommandProccess(ctx, ctx.message.text);
             if(!proccessResult) {
                 return
@@ -112,6 +123,16 @@ class App {
             }
             this.isResponsing = false;
           });
+    }
+
+    private subsribeIntervalClients(chatContext: Context) {
+        this.intervalClients.forEach((client) => {
+            if(client.chatContext === undefined) {
+                client.chatContext = chatContext;
+                client.startIntervalSubscribtions();
+            }
+        });
+        this.intervalClientsSubscribed = true;
     }
 }
 

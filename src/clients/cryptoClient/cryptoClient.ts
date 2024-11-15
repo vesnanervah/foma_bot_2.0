@@ -6,10 +6,10 @@ import { IntervalCommandClient } from "../intervalCommandClient.js";
 class CryptoClient extends IntervalCommandClient {
     private baseUrl = 'https://api.coinpaprika.com/v1';
     private triggerRegExp = /стоимость|курс|пачем$/i;
-    private dogeRegExp = /^доги((чи)|(коины?))?$/i;
-    private bitcoinRegExp = /^бит((ок)|(коины?))$/i;
-    private toncoinRegExp = /^тон(коин)?$/i;
-    private notcoinRegExp = /^нот(коин)?$/i;
+    private dogeRegExp = /^доги((чей)|(чи)|(коин(ы|а|ов)?))?$/i;
+    private bitcoinRegExp = /^бит((ка)|(ок)|(коин(ы|а|ов)?))$/i;
+    private toncoinRegExp = /^тон(коин(ы|а|ов)?)?$/i;
+    private notcoinRegExp = /^нот(коин(ы|а|ов)?)?$/i;
     private coinIds: RegExpIds  = {
         'doge-dogecoin': this.dogeRegExp,
         'btc-bitcoin': this.bitcoinRegExp,

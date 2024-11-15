@@ -8,8 +8,8 @@ class CryptoClient extends IntervalCommandClient {
     private triggerRegExp = /стоимость|курс|пачем$/i;
     private dogeRegExp = /^доги((чей)|(чи)|(коин(ы|а|ов)?))?$/i;
     private bitcoinRegExp = /^бит((ка)|(ок)|(коин(ы|а|ов)?))$/i;
-    private toncoinRegExp = /^тон(коин(ы|а|ов)?)?$/i;
-    private notcoinRegExp = /^нот(коин(ы|а|ов)?)?$/i;
+    private toncoinRegExp = /^тон(коин(ы|а|ов)?|(а))?$/i;
+    private notcoinRegExp = /^нот(коин(ы|а|ов)?|(а))?$/i;
     private coinIds: RegExpIds  = {
         'doge-dogecoin': this.dogeRegExp,
         'btc-bitcoin': this.bitcoinRegExp,

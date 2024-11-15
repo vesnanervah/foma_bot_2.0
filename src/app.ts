@@ -28,6 +28,7 @@ class App {
     private whenCommandClient = new WhenCommandClient();
     private whoCommandnClient = new WhoCommandClient();
     private profanitiesClient = new ProfanityCommandClient();
+    private intervalClientsSubscribed = false;
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,
         this.geocoder,
@@ -73,14 +74,9 @@ class App {
 
     private addTextSubscribtion() {
         this.bot.on(message('text'), async (ctx) => {
-            // TODO: split
-            this.intervalClients.forEach((client) => {
-                if(client.chatContext === undefined) {
-                    client.chatContext = ctx;
-                    client.startIntervalSubscribtions();
-                }
-            });
-            
+            if(!this.intervalClientsSubscribed)
+            this.subsribeIntervalClients(ctx);
+
             var proccessResult = this.startCommandProccess(ctx, ctx.message.text);
             if(!proccessResult) {
                 return
@@ -127,6 +123,16 @@ class App {
             }
             this.isResponsing = false;
           });
+    }
+
+    private subsribeIntervalClients(chatContext: Context) {
+        this.intervalClients.forEach((client) => {
+            if(client.chatContext === undefined) {
+                client.chatContext = chatContext;
+                client.startIntervalSubscribtions();
+            }
+        });
+        this.intervalClientsSubscribed = true;
     }
 }
 

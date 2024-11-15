@@ -96,7 +96,7 @@ class CryptoClient extends IntervalCommandClient {
             }
             const randomCoin = this.getRandomCoin();
             const result = await this.getOhlcv(randomCoin, randomCoin);
-            await this.chatContext.sendMessage(result);
+            await this.chatContext.sendMessage(`Олег Евгеньевич держит в курсе: ${result}`);
         });
     }
 

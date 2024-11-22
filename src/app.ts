@@ -14,6 +14,7 @@ import { BaseCommandClient } from "./clients/baseCommandClient.js";
 import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
 import { CryptoClient } from "./clients/cryptoClient/cryptoClient.js";
 import { IntervalCommandClient } from "./clients/intervalCommandClient.js";
+import { GifsClient } from "./clients/gifsClient/gifsClient.js";
 
 class App {
     private isResponsing = false;
@@ -28,6 +29,7 @@ class App {
     private whenCommandClient = new WhenCommandClient();
     private whoCommandnClient = new WhoCommandClient();
     private profanitiesClient = new ProfanityCommandClient();
+    private gifsClient = new GifsClient();
     private intervalClientsSubscribed = false;
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,
@@ -39,6 +41,7 @@ class App {
         this.whoCommandnClient,
         this.profanitiesClient,
         this.cryptoClient,
+        this.gifsClient,
     ];
     private intervalClients: Array<IntervalCommandClient> = [
         this.cryptoClient,
@@ -47,6 +50,7 @@ class App {
     startApp() {
         this.addTextSubscribtion();
         this.addPhotoSubscribtion();
+        this.addGifsSubscribtion();
         this.bot.launch();
         console.log('Фома 2.0 начал работу');
         setInterval(() => console.log('Bot is online'), 100000);
@@ -102,6 +106,31 @@ class App {
 
     private addPhotoSubscribtion() {
         this.bot.on(message('photo'), async(ctx) => {
+            var proccessResult = this.startCommandProccess(ctx, ctx.message.caption ?? '');
+            if(!proccessResult) {
+                return
+            }
+            this.isResponsing = true;
+            const match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
+            if(match) {
+                match.getReply({
+                    commandName: proccessResult.commandName,
+                    commandArgument: proccessResult.commandArgument,
+                    ctx: ctx,
+                    members: this.membersStorageClient.collectedMembers,
+                });
+            } else {
+                this.unknownCommandClient.getReply({
+                    commandName: proccessResult.commandName,
+                    ctx: ctx,
+                })
+            }
+            this.isResponsing = false;
+          });
+    }
+
+    private addGifsSubscribtion() {
+        this.bot.on(message('document'), async(ctx) => {
             var proccessResult = this.startCommandProccess(ctx, ctx.message.caption ?? '');
             if(!proccessResult) {
                 return

@@ -131,9 +131,7 @@ class App {
 
     private addGifsSubscribtion() {
         this.bot.on(message('document'), async(ctx) => {
-            console.log(ctx);
-            if (this.gifsClient.waitingForGifExpression === undefined) return;
-
+            this.gifsClient.processGifMessage(ctx);
           });
     }
 

@@ -77,6 +77,7 @@ class GifsClient extends BaseCommandClient {
             }
             this.waitingForGifDayOfWeek = undefined;
             this.weekdaysGifBindings = this.weekdaysGifBindings.map((day) => copied.dayIndex == day.dayIndex ? copied : day);
+            // TODO: save gif id in local storage
             ctx.reply('Запомнил гифку, братан');
         } catch {
             ctx.reply('Что-то пошло не так')

@@ -11,7 +11,7 @@ class ImageClient extends BaseCommandClient{
     async getReply(args: GetReplyArgs) {
         try{
             const url = await args.ctx!.telegram.getFileLink((args.ctx!.message.photo[1] ?? args.ctx!.message.photo[0]).file_id);
-            const  img = args.commandName.toLowerCase() == 'рсфср' ? await this.getRcfcr(url.toString()) : await this.getShalash(url.toString());
+            const img = args.commandName.toLowerCase() == 'рсфср' ? await this.getRcfcr(url.toString()) : await this.getShalash(url.toString());
             args.ctx?.replyWithPhoto({source: img});
         }
         catch {

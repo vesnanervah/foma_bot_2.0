@@ -1,8 +1,8 @@
 import { Context, NarrowedContext } from "telegraf";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 import { Message, Update } from "@telegraf/types";
-import Jimp from "jimp";
 
+// TODO: implement IntervalCommandClient and every day check of date; Send gif of current day if it wasn't send already
 class GifsClient extends BaseCommandClient {
     private setGifTriggerRegExp = /^гиф(ка)?$/i;
     private showWeekdayTriggerRegExp = /^(какой (сейчас )?)?день недели(\?)?$/i;

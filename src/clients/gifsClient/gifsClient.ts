@@ -3,7 +3,8 @@ import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 import { Message, Update } from "@telegraf/types";
 
 class GifsClient extends BaseCommandClient {
-    private triggerRegExp = /^гиф(ка)?$/i;
+    private setGifTriggerRegExp = /^гиф(ка)?$/i;
+    private showWeekdayTriggerRegExp = /^(какой (сейчас )?)?день недели(\?)?$/i;
     private monday: DayOfWeek = {regExp: /^понедельник$/i, dayIndex: 0};
     private tuesday: DayOfWeek = {regExp: /^вторник$/i, dayIndex: 1};
     private wednesday: DayOfWeek = {regExp: /^среда$/i, dayIndex: 2};
@@ -25,9 +26,26 @@ class GifsClient extends BaseCommandClient {
     private waitingForGifDayOfWeek?: DayOfWeek;
 
     getReply(args: GetReplyArgs): void {
+        if(this.showWeekdayTriggerRegExp.test([args.commandName, args.commandArgument].join(' '))) {
+            const now = new Date(Date.now());
+            const found = this.weekdaysGifBindings.find((day) => day.dayIndex === now.getDate());
+            const savedGifId = found?.telegramGifId;
+            if(!savedGifId) {
+                args.ctx?.reply('Не нашел гифки на этот день недели, брат');
+                return;
+            }
+            try {
+                // TODO: send gif
+
+            } catch {
+                args.ctx?.reply('Не получилось загрузить гифку. Дурофф ты сука????');
+            }
+
+        }
+
         if (!args.commandArgument) {
             args.ctx?.reply('Ты забыл указать день недели. После этого отправь гифку и я запомню ее.');
-            return
+            return;
         }
         if (this.waitingForGifDayOfWeek != undefined) {
              args.ctx?.reply('Воу-воу, по одному! Для начала скиньте гифку для предыдущего выбранного дня недели.');
@@ -43,7 +61,7 @@ class GifsClient extends BaseCommandClient {
 
 
     isMatch(commandName: string, commandArgument?: string | undefined): boolean {
-        return this.triggerRegExp.test(commandName);
+        return this.setGifTriggerRegExp.test(commandName) || this.showWeekdayTriggerRegExp.test([commandName, commandArgument].join(' '));
     }
 
     async processGifMessage(ctx: NarrowedContext<Context<Update>, Update.MessageUpdate<(Record<"document", {}>) | (Record<"document", {}> & Message.DocumentMessage) | any>>): Promise<void> {

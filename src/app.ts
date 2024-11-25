@@ -66,8 +66,8 @@ class App {
             return;
         }
         const command = message.slice(message.indexOf(',') + 1).trim();
-        const commandName = command.split(' ')[0].toLowerCase();
-        const commandArgument = command.split(' ').slice(1).join(' ');
+        const commandName = command.split(' ')[0].toLowerCase().trim();
+        const commandArgument = command.split(' ').slice(1).join(' ')?.trim();
         console.log('Incoming command: ' + commandName);
         console.log('Incoming argument: ' + commandArgument);
         return {
@@ -80,7 +80,7 @@ class App {
         this.bot.on(message('text'), async (ctx) => {
             if(!this.intervalClientsSubscribed)
             this.subsribeIntervalClients(ctx);
-
+            // TODO: refactor copypast
             var proccessResult = this.startCommandProccess(ctx, ctx.message.text);
             if(!proccessResult) {
                 return
@@ -131,26 +131,9 @@ class App {
 
     private addGifsSubscribtion() {
         this.bot.on(message('document'), async(ctx) => {
-            var proccessResult = this.startCommandProccess(ctx, ctx.message.caption ?? '');
-            if(!proccessResult) {
-                return
-            }
-            this.isResponsing = true;
-            const match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
-            if(match) {
-                match.getReply({
-                    commandName: proccessResult.commandName,
-                    commandArgument: proccessResult.commandArgument,
-                    ctx: ctx,
-                    members: this.membersStorageClient.collectedMembers,
-                });
-            } else {
-                this.unknownCommandClient.getReply({
-                    commandName: proccessResult.commandName,
-                    ctx: ctx,
-                })
-            }
-            this.isResponsing = false;
+            console.log(ctx);
+            if (this.gifsClient.waitingForGifExpression === undefined) return;
+
           });
     }
 

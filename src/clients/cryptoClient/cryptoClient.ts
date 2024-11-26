@@ -1,9 +1,10 @@
 import got from "got";
 import { GetReplyArgs } from "../baseCommandClient.js";
 import { IntervalCommandClient } from "../intervalCommandClient.js";
+import { Context } from "telegraf";
 
 
-class CryptoClient extends IntervalCommandClient {
+class CryptoClient extends IntervalCommandClient<Context> {
     private baseUrl = 'https://api.coinpaprika.com/v1';
     private triggerRegExp = /стоимость|курс|пачем$/i;
     private dogeRegExp = /^доги((чей)|(чи)|(коин(ы|а|ов)?))?$/i;
@@ -91,7 +92,7 @@ class CryptoClient extends IntervalCommandClient {
 
     private async setIntervalToRandomPrediction(): Promise<void> {
         await this.startIntervalCommand(async () => {
-            if(this.chatContext == null) {
+            if(this.chatContext == null || this.chatContext == undefined) {
                 return
             }
             const randomCoin = this.getRandomCoin();

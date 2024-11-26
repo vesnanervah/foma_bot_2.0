@@ -45,8 +45,9 @@ class App {
         this.cryptoClient,
         this.gifsClient,
     ];
-    private intervalClients: Array<IntervalCommandClient> = [
+    private intervalClients: Array<IntervalCommandClient<Context>> = [
         this.cryptoClient,
+        this.gifsClient,
     ];
 
     startApp() {

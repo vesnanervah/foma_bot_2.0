@@ -1,8 +1,8 @@
 import { BaseCommandClient } from "./baseCommandClient.js";
 import { Context } from "telegraf";
 
-abstract class IntervalCommandClient extends BaseCommandClient {
-    chatContext: Context | undefined;
+abstract class IntervalCommandClient<T extends Context> extends BaseCommandClient {
+    chatContext: T | undefined;
 
     abstract startIntervalSubscribtions(): void;
 

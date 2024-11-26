@@ -4,11 +4,12 @@ import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 class MembersStorageClient extends BaseCommandClient{
     triggerRegExp = /^очистить мемберов$/i;
     collectedMembersLocalStorageKey = 'members';
-    localStorage = new LocalStorage('./scratch');
     collectedMembers: Array<string>;
+    private localStorage: LocalStorage;
 
-    constructor() {
+    constructor(localStorage: LocalStorage) {
         super();
+        this.localStorage = localStorage;
         this.collectedMembers = this.getLocalCollectedMembers();
     }
 

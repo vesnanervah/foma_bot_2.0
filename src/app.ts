@@ -15,12 +15,14 @@ import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanit
 import { CryptoClient } from "./clients/cryptoClient/cryptoClient.js";
 import { IntervalCommandClient } from "./clients/intervalCommandClient.js";
 import { GifsClient } from "./clients/gifsClient/gifsClient.js";
+import { LocalStorage } from "node-localstorage";
 
 class App {
     private isResponsing = false;
     private bot = new Telegraf(TG_TOKEN);
+    private localStorage = new LocalStorage('./scratch');
     private unknownCommandClient = new UnknownCommandClient();
-    private membersStorageClient = new MembersStorageClient();
+    private membersStorageClient = new MembersStorageClient(this.localStorage);
     private geocoder = new GeocoderClient(GEOCODER_KEY);
     private weatherClient = new WeatherClient(WEATHER_KEY);
     private cryptoClient = new CryptoClient();
@@ -29,7 +31,7 @@ class App {
     private whenCommandClient = new WhenCommandClient();
     private whoCommandnClient = new WhoCommandClient();
     private profanitiesClient = new ProfanityCommandClient();
-    private gifsClient = new GifsClient();
+    private gifsClient = new GifsClient(this.localStorage);
     private intervalClientsSubscribed = false;
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,

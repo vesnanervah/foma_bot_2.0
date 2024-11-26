@@ -1,9 +1,11 @@
 import { Context, NarrowedContext } from "telegraf";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 import { Message, Update } from "@telegraf/types";
+import { LocalStorage } from "node-localstorage";
 
 // TODO: implement IntervalCommandClient and every day check of date; Send gif of current day if it wasn't send already
 class GifsClient extends BaseCommandClient {
+    private localStorage: LocalStorage;
     private setGifTriggerRegExp = /^гиф(ка)?$/i;
     private showWeekdayTriggerRegExp = /^(какой (сейчас )?)?день недели(\?)?$/i;
     private monday: DayOfWeek = {regExp: /^понедельник$/i, dayIndex: 1};
@@ -25,6 +27,11 @@ class GifsClient extends BaseCommandClient {
 
     // also an indicator of already started gifs proccessing
     private waitingForGifDayOfWeek?: DayOfWeek;
+
+    constructor(localStorage: LocalStorage) {
+        super();
+        this.localStorage = localStorage;
+    }
 
     async getReply(args: GetReplyArgs): Promise<void> {
         if(this.showWeekdayTriggerRegExp.test([args.commandName, args.commandArgument].join(' '))) {

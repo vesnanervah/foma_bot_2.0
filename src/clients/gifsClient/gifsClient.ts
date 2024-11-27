@@ -1,5 +1,5 @@
 import { Context, NarrowedContext } from "telegraf";
-import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
+import { GetReplyArgs } from "../baseCommandClient.js";
 import { Message, Update } from "@telegraf/types";
 import { LocalStorage } from "node-localstorage";
 import { IntervalCommandClient } from "../intervalCommandClient.js";

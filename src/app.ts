@@ -134,6 +134,7 @@ class App {
 
     private addGifsSubscribtion() {
         this.bot.on(message('document'), async(ctx) => {
+            if (ctx.message.from.is_bot) return;
             this.gifsClient.processGifMessage(ctx);
           });
     }

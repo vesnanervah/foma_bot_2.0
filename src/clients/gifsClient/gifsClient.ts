@@ -3,8 +3,6 @@ import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 import { Message, Update } from "@telegraf/types";
 import { LocalStorage } from "node-localstorage";
 import { IntervalCommandClient } from "../intervalCommandClient.js";
-
-// TODO: implement IntervalCommandClient and every day check of date; Send gif of current day if it wasn't send already
 class GifsClient extends IntervalCommandClient<NarrowedContext<Context<Update>, Update.MessageUpdate<(Record<"document", {}>) | (Record<"document", {}> & Message.DocumentMessage) | any>>> {
     private localStorage: LocalStorage;
     private localStorageWeekdayGifBindingsKey = 'weekdays'

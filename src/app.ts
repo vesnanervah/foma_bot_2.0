@@ -59,76 +59,59 @@ class App {
         setInterval(() => console.log('Bot is online'), 100000);
     }
 
-    private startCommandProccess(ctx: NarrowedContext<Context<Update>, Update.MessageUpdate<any>>, message: string): CommandProccessResult | undefined {
-        const sender = [ctx.update.message.from.first_name, (ctx.update.message.from.last_name ?? '')].join(' ').trim();
-        this.membersStorageClient.addMember(sender);
-        if(!message.toLowerCase().startsWith('фома, ')) {
-            return;
-        }
+    private async processIncomingText(args: ProcessTextCommandArgs): Promise<void> {
         if(this.isResponsing) {
             return;
         }
-        const command = message.slice(message.indexOf(',') + 1).trim();
-        const commandName = command.split(' ')[0].toLowerCase().trim();
-        const commandArgument = command.split(' ').slice(1).join(' ')?.trim();
-        console.log('Incoming command: ' + commandName);
-        console.log('Incoming argument: ' + commandArgument);
-        return {
-            commandName: commandName,
-            commandArgument: commandArgument
-        };
+        const message = args.getIcomingMessage();
+        const parsedCommand = this.parseTextCommand(message);
+        if(!parsedCommand) {
+            return;
+        }
+        this.isResponsing = true; 
+        // TODO: do not proceed next if command name is empty
+        var match = this.clients.find((client) => client.isMatch(parsedCommand.commandName, parsedCommand.commandArgument));
+        if(match) {
+            match.getReply({
+                commandName: parsedCommand.commandName,
+                commandArgument: parsedCommand.commandArgument,
+                ctx: args.context,
+                members: this.membersStorageClient.collectedMembers,
+            });
+        } else {
+            this.unknownCommandClient.getReply({
+                commandName: parsedCommand.commandName,
+                ctx: args.context,
+            })
+        }
+        this.isResponsing = false;
+
     }
 
     private addTextSubscribtion() {
         this.bot.on(message('text'), async (ctx) => {
             if(!this.intervalClientsSubscribed)
             this.subsribeIntervalClients(ctx);
-            // TODO: refactor copypast
-            var proccessResult = this.startCommandProccess(ctx, ctx.message.text);
-            if(!proccessResult) {
-                return
-            }
-            this.isResponsing = true;
-            var match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
-            if(match) {
-                match.getReply({
-                    commandName: proccessResult.commandName,
-                    commandArgument: proccessResult.commandArgument,
-                    ctx: ctx,
-                    members: this.membersStorageClient.collectedMembers,
-                });
-            } else {
-                this.unknownCommandClient.getReply({
-                    commandName: proccessResult.commandName,
-                    ctx: ctx,
-                })
-            }
-            this.isResponsing = false;
+        // TODO: find native way to get all users from chat
+            const sender = [ctx.update.message.from.first_name, (ctx.update.message.from.last_name ?? '')].join(' ').trim();
+            this.membersStorageClient.addMember(sender);
+            this.processIncomingText({
+                context: ctx,
+                getIcomingMessage() {
+                    return ctx.message.text;
+                }
+            });
           });
     }
 
     private addPhotoSubscribtion() {
         this.bot.on(message('photo'), async(ctx) => {
-            var proccessResult = this.startCommandProccess(ctx, ctx.message.caption ?? '');
-            if(!proccessResult) {
-                return
-            }
-            this.isResponsing = true;
-            const match = this.clients.find((client) => client.isMatch(proccessResult!.commandName, proccessResult!.commandArgument));
-            if(match) {
-                match.getReply({
-                    commandName: proccessResult.commandName,
-                    commandArgument: proccessResult.commandArgument,
-                    ctx: ctx,
-                    members: this.membersStorageClient.collectedMembers,
-                });
-            } else {
-                this.unknownCommandClient.getReply({
-                    commandName: proccessResult.commandName,
-                    ctx: ctx,
-                })
-            }
-            this.isResponsing = false;
+            return this.processIncomingText({
+                context: ctx,
+                getIcomingMessage() {
+                    return ctx.message.caption ?? ''
+                },
+            })
           });
     }
 
@@ -148,9 +131,29 @@ class App {
         });
         this.intervalClientsSubscribed = true;
     }
+
+    private parseTextCommand(message: string): parsedCommand | void {
+        if(!message.toLowerCase().startsWith('фома, ')) {
+            return;
+        }
+        const command = message.slice(message.indexOf(',') + 1).trim();
+        const commandName = command.split(' ')[0].toLowerCase().trim();
+        const commandArgument = command.split(' ').slice(1).join(' ')?.trim();
+        console.log('Incoming command: ' + commandName);
+        console.log('Incoming argument: ' + commandArgument);
+        return {
+            commandName: commandName,
+            commandArgument: commandArgument
+        };
+    }
 }
 
-type CommandProccessResult = {
+type ProcessTextCommandArgs = {
+    context: NarrowedContext<Context<Update>, Update>,
+    getIcomingMessage: () => string,
+}
+
+type parsedCommand = {
     commandName: string,
     commandArgument?: string,
 }

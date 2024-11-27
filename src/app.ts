@@ -14,12 +14,15 @@ import { BaseCommandClient } from "./clients/baseCommandClient.js";
 import { ProfanityCommandClient } from "./clients/simpleCommandsReplies/profanityCommandClient.js";
 import { CryptoClient } from "./clients/cryptoClient/cryptoClient.js";
 import { IntervalCommandClient } from "./clients/intervalCommandClient.js";
+import { GifsClient } from "./clients/gifsClient/gifsClient.js";
+import { LocalStorage } from "node-localstorage";
 
 class App {
     private isResponsing = false;
     private bot = new Telegraf(TG_TOKEN);
+    private localStorage = new LocalStorage('./scratch');
     private unknownCommandClient = new UnknownCommandClient();
-    private membersStorageClient = new MembersStorageClient();
+    private membersStorageClient = new MembersStorageClient(this.localStorage);
     private geocoder = new GeocoderClient(GEOCODER_KEY);
     private weatherClient = new WeatherClient(WEATHER_KEY);
     private cryptoClient = new CryptoClient();
@@ -28,6 +31,7 @@ class App {
     private whenCommandClient = new WhenCommandClient();
     private whoCommandnClient = new WhoCommandClient();
     private profanitiesClient = new ProfanityCommandClient();
+    private gifsClient = new GifsClient(this.localStorage);
     private intervalClientsSubscribed = false;
     private clients: Array<BaseCommandClient> =  [
         this.membersStorageClient,
@@ -39,14 +43,17 @@ class App {
         this.whoCommandnClient,
         this.profanitiesClient,
         this.cryptoClient,
+        this.gifsClient,
     ];
-    private intervalClients: Array<IntervalCommandClient> = [
+    private intervalClients: Array<IntervalCommandClient<Context>> = [
         this.cryptoClient,
+        this.gifsClient,
     ];
 
     startApp() {
         this.addTextSubscribtion();
         this.addPhotoSubscribtion();
+        this.addGifsSubscribtion();
         this.bot.launch();
         console.log('Фома 2.0 начал работу');
         setInterval(() => console.log('Bot is online'), 100000);
@@ -62,8 +69,8 @@ class App {
             return;
         }
         const command = message.slice(message.indexOf(',') + 1).trim();
-        const commandName = command.split(' ')[0].toLowerCase();
-        const commandArgument = command.split(' ').slice(1).join(' ');
+        const commandName = command.split(' ')[0].toLowerCase().trim();
+        const commandArgument = command.split(' ').slice(1).join(' ')?.trim();
         console.log('Incoming command: ' + commandName);
         console.log('Incoming argument: ' + commandArgument);
         return {
@@ -76,7 +83,7 @@ class App {
         this.bot.on(message('text'), async (ctx) => {
             if(!this.intervalClientsSubscribed)
             this.subsribeIntervalClients(ctx);
-
+            // TODO: refactor copypast
             var proccessResult = this.startCommandProccess(ctx, ctx.message.text);
             if(!proccessResult) {
                 return
@@ -122,6 +129,13 @@ class App {
                 })
             }
             this.isResponsing = false;
+          });
+    }
+
+    private addGifsSubscribtion() {
+        this.bot.on(message('document'), async(ctx) => {
+            if (ctx.message.from.is_bot) return;
+            this.gifsClient.processGifMessage(ctx);
           });
     }
 

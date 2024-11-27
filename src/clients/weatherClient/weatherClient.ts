@@ -4,6 +4,7 @@ import { GEOCODER_KEY } from "../../../token.js";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
 import { GeocodingResult } from "../geocoderClient/entities/geocodingResult.js";
 import { CurrentWeather } from "./entities/currentWeather.js";
+import { Update } from "@telegraf/types";
 
 
 const aboutHotTemperature = ['лютая жара', 'просто Вьетнам', 'настоящее пекло', 'невыносимо жарко', 'можно стать негром'];
@@ -29,7 +30,7 @@ class WeatherClient extends BaseCommandClient{
         return this.triggerRegExp.test(commandName);
     }
 
-    async getReply(args: GetReplyArgs) {
+    async getReply(args: GetReplyArgs<Update>) {
         if(!args.commandArgument || args.commandArgument.length === 0) {
              args.ctx?.reply('где именно то')
              return

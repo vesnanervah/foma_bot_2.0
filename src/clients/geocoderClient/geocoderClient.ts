@@ -2,6 +2,7 @@ import {got } from 'got'
 import { BaseCommandClient, GetReplyArgs } from '../baseCommandClient.js';
 import { GeocodingResult } from './entities/geocodingResult.js';
 import { GeocoderResponse } from './entities/geocoderResponse.js';
+import { Update } from '@telegraf/types';
 
 
 class GeocoderClient extends BaseCommandClient{
@@ -20,7 +21,7 @@ class GeocoderClient extends BaseCommandClient{
         return this.triggerRegExp.test(commandName);
     }
 
-    async getReply(args: GetReplyArgs) {
+    async getReply(args: GetReplyArgs<Update>) {
         if(!args.commandArgument || args.commandArgument.length === 0) {
             args.ctx?.reply('А город я угадать должен?');
             return

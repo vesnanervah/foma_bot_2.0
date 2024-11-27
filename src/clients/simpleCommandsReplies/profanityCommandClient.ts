@@ -1,3 +1,4 @@
+import { Message, Update } from "@telegraf/types";
 import { GetReplyArgs } from "../baseCommandClient.js";
 import { BaseSimpleCommandClient } from "./baseSimpleCommandClient.js";
 
@@ -47,7 +48,7 @@ class ProfanityCommandClient extends BaseSimpleCommandClient {
         'соси',
     ]
 
-    getReply(args: GetReplyArgs): void {
+    getReply(args: GetReplyArgs<Update.MessageUpdate<Record<"text", {}> & Message.TextMessage> & any>): void {
         var sentence = [args.commandName, args.commandArgument ?? ''].join(' ');
         if (this.isFU(sentence)) {
             args.ctx?.reply(this.getRandomValueFromArray(this.fUReplies));

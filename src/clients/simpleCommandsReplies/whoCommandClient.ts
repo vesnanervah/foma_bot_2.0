@@ -1,3 +1,4 @@
+import { Update } from "@telegraf/types";
 import { GetReplyArgs } from "../baseCommandClient.js";
 import { BaseSimpleCommandClient } from "./baseSimpleCommandClient.js";
 
@@ -23,7 +24,7 @@ class WhoCommandClient extends BaseSimpleCommandClient {
         return this.triggerRegExp.test(this.pretext.test(commandName) ? (commandArgument?.split(' ')[0] ?? '')  : commandName);
     }
 
-    getReply(args: GetReplyArgs) {
+    getReply(args: GetReplyArgs<Update>) {
         if(!args.commandArgument || args.commandArgument.length == 0) {
             args.ctx?.reply('Ты!');
             return;

@@ -1,5 +1,6 @@
 import Jimp from "jimp";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
+import { Message, Update } from "@telegraf/types";
 
 class ImageClient extends BaseCommandClient{
     triggerRegExp = /^рсфср|шалаш/i;
@@ -8,7 +9,7 @@ class ImageClient extends BaseCommandClient{
         return this.triggerRegExp.test(commandName);
     }
 
-    async getReply(args: GetReplyArgs) {
+    async getReply(args: GetReplyArgs<Update.MessageUpdate<Record<"photo", {}> & Message.PhotoMessage> & any>) {
         try{
             const url = await args.ctx!.telegram.getFileLink((args.ctx!.message.photo[1] ?? args.ctx!.message.photo[0]).file_id);
             const img = args.commandName.toLowerCase() == 'рсфср' ? await this.getRcfcr(url.toString()) : await this.getShalash(url.toString());

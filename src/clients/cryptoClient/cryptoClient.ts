@@ -2,6 +2,7 @@ import got from "got";
 import { GetReplyArgs } from "../baseCommandClient.js";
 import { IntervalCommandClient } from "../intervalCommandClient.js";
 import { Context } from "telegraf";
+import { Update } from "@telegraf/types";
 
 
 class CryptoClient extends IntervalCommandClient<Context> {
@@ -18,7 +19,7 @@ class CryptoClient extends IntervalCommandClient<Context> {
         'not-notcoin': this.notcoinRegExp,
     }
 
-    async getReply(args: GetReplyArgs): Promise<void> {
+    async getReply(args: GetReplyArgs<Update>): Promise<void> {
         const response = await this.getOhlcvFromSuggest(args.commandArgument);
         args.ctx?.reply(response);
     }

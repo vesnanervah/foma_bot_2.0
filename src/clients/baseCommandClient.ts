@@ -5,7 +5,7 @@ import { Context, NarrowedContext } from "telegraf";
 abstract class BaseCommandClient {
     static random = new Random(new ARC4RNG);
 
-    abstract getReply(args: GetReplyArgs):void;
+    abstract getReply(args: GetReplyArgs<Update>):void;
 
     abstract isMatch(commandName: string, commandArgument?: string): boolean;
 
@@ -14,11 +14,11 @@ abstract class BaseCommandClient {
     }
 }
 
-type GetReplyArgs<> = {
+type GetReplyArgs<ContextUpdateType extends Update> = {
     commandName: string,
     members?: Array<string>,
     commandArgument?: string,
-    ctx?: NarrowedContext<Context<Update>, Update.MessageUpdate<any>>,
+    ctx?: NarrowedContext<Context<Update>, ContextUpdateType>,
 };
 
 export { BaseCommandClient, GetReplyArgs };

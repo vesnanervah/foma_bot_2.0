@@ -3,7 +3,7 @@ import { GetReplyArgs } from "../baseCommandClient.js";
 import { Message, Update } from "@telegraf/types";
 import { LocalStorage } from "node-localstorage";
 import { IntervalCommandClient } from "../intervalCommandClient.js";
-class GifsClient extends IntervalCommandClient<NarrowedContext<Context<Update>, Update.MessageUpdate<(Record<"document", {}>) | (Record<"document", {}> & Message.DocumentMessage) | any>>> {
+class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text", {}> & Message.TextMessage> & any> {
     private localStorage: LocalStorage;
     private localStorageWeekdayGifBindingsKey = 'weekdays'
     private setGifTriggerRegExp = /^гиф(ка)?$/i;
@@ -37,7 +37,7 @@ class GifsClient extends IntervalCommandClient<NarrowedContext<Context<Update>, 
         }
     }
 
-    async getReply(args: GetReplyArgs): Promise<void> {
+    async getReply(args: GetReplyArgs<Update>): Promise<void> {
         if(this.showWeekdayTriggerRegExp.test([args.commandName, args.commandArgument].join(' '))) {
             const now = new Date(Date.now());
             const found = this.weekdayGifBindings.find((day) => day.dayIndex === now.getDay());

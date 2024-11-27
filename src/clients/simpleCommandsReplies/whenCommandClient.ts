@@ -1,3 +1,4 @@
+import { Update } from "@telegraf/types";
 import { GetReplyArgs } from "../baseCommandClient.js";
 import { BaseSimpleCommandClient } from "./baseSimpleCommandClient.js";
 
@@ -15,7 +16,7 @@ class WhenCommandClient extends BaseSimpleCommandClient {
         return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
     }
 
-    getReply(args: GetReplyArgs) {
+    getReply(args: GetReplyArgs<Update>) {
         const date = this.randomDate(new Date(Date.now()), new Date(Date.parse('01.01.2032')));
         args.ctx?.reply(`${this.getRandomPrelude()} ${date.toLocaleDateString('ru-RU')}`);
     }

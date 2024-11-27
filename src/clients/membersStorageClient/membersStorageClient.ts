@@ -1,5 +1,6 @@
 import { LocalStorage } from "node-localstorage";
 import { BaseCommandClient, GetReplyArgs } from "../baseCommandClient.js";
+import { Update } from "@telegraf/types";
 
 class MembersStorageClient extends BaseCommandClient{
     triggerRegExp = /^очистить мемберов$/i;
@@ -25,7 +26,7 @@ class MembersStorageClient extends BaseCommandClient{
         }
     }
 
-    getReply(args: GetReplyArgs) {
+    getReply(args: GetReplyArgs<Update>) {
         this.clearCollectedMembers();
         args.ctx?.reply('Мемберы почищены...');
     }

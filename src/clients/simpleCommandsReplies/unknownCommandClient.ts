@@ -1,3 +1,4 @@
+import { Update } from "@telegraf/types";
 import { GetReplyArgs } from "../baseCommandClient.js";
 import { BaseSimpleCommandClient } from "./baseSimpleCommandClient.js";
 
@@ -28,7 +29,7 @@ class UnknownCommandClient extends BaseSimpleCommandClient {
         'В детстве человека паука часто наказывали и ставили в правый верхний угол'
     ];
 
-    getReply(args: GetReplyArgs) {
+    getReply(args: GetReplyArgs<Update>) {
         args.ctx?.reply(super.getRandomPrelude());
     }
     

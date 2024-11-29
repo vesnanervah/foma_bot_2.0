@@ -3,48 +3,26 @@ import { GetReplyArgs } from "../baseCommandClient.js";
 import { Message, Update } from "@telegraf/types";
 import { LocalStorage } from "node-localstorage";
 import { IntervalCommandClient } from "../intervalCommandClient.js";
+import { GifBindedWeekday, StringifiedGifBindedWeekday } from "./entities/gifBindedWeekday.js";
 class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text", {}> & Message.TextMessage> & any> {
     private localStorage: LocalStorage;
     private localStorageWeekdayGifBindingsKey = 'weekdays'
     private setGifTriggerRegExp = /^гиф(ка)?$/i;
     private showWeekdayTriggerRegExp = /^(какой (сейчас )?)?день недели(\?)?$/i;
-    private monday: DayOfWeek = {regExp: /^понедельник$/i, dayIndex: 1};
-    private tuesday: DayOfWeek = {regExp: /^вторник$/i, dayIndex: 2};
-    private wednesday: DayOfWeek = {regExp: /^среда$/i, dayIndex: 3};
-    private thursday: DayOfWeek = {regExp: /^четверг$/i, dayIndex: 4};
-    private friday: DayOfWeek = {regExp: /^пятница$/i,  dayIndex: 5};
-    private saturday: DayOfWeek = {regExp: /^суббота$/i, dayIndex: 6};
-    private sunday: DayOfWeek = {regExp: /^воскресение$/i, dayIndex: 7};
-    private weekdayGifBindings: Array<DayOfWeek> = [
-        this.monday,
-        this.tuesday,
-        this.wednesday,
-        this.thursday,
-        this.friday,
-        this.saturday,
-        this.sunday,
-    ]
-
+    private gifBindedWeekdays = GifBindedWeekday.generateDaysOfWeek();
     // also an indicator of already started gifs proccessing
-    private waitingForGifDayOfWeek?: DayOfWeek;
+    private waitingForGifDayOfWeek?: GifBindedWeekday;
 
     constructor(localStorage: LocalStorage) {
         super();
         this.localStorage = localStorage;
-        const savedWeekdayGifBindings = this.loadWeekdayGifBindingsFromLocal();
-        // TODO: remove in loadFromLocalMethod
-        if (savedWeekdayGifBindings.length > 0) {
-            this.weekdayGifBindings.forEach((day) => {
-                day.lastSentDate = savedWeekdayGifBindings[day.dayIndex - 1].lastSentDate;
-                day.telegramGifId = savedWeekdayGifBindings[day.dayIndex - 1].telegramGifId;
-            });
-        }
+        this.loadWeekdayGifBindingsFromLocal();
     }
 
     async getReply(args: GetReplyArgs<Update>): Promise<void> {
         if(this.showWeekdayTriggerRegExp.test([args.commandName, args.commandArgument].join(' '))) {
             const now = new Date(Date.now());
-            const found = this.weekdayGifBindings.find((day) => day.dayIndex === now.getDay());
+            const found = this.gifBindedWeekdays.find((day) => day.dayIndex === now.getDay());
             const savedGifId = found?.telegramGifId;
             if(!savedGifId) {
                 args.ctx?.reply('Не нашел гифки на этот день недели, брат');
@@ -68,7 +46,7 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
              args.ctx?.reply('Воу-воу, по одному! Для начала скиньте гифку для предыдущего выбранного дня недели.');
              return;
         }
-        const matched = this.weekdayGifBindings.find((binding) => binding.regExp.test(args.commandArgument!));
+        const matched = this.gifBindedWeekdays.find((binding) => binding.getRegExp().test(args.commandArgument!));
         if (matched) {
             this.waitingForGifDayOfWeek = matched;
         }
@@ -87,7 +65,7 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
                 return;
             }
             const now = new Date(Date.now());
-            this.weekdayGifBindings.forEach(async (day) => {
+            this.gifBindedWeekdays.forEach(async (day) => {
                 if (day.lastSentDate == undefined) return;
                 const hasntSentToday =  day.lastSentDate!.getFullYear() != now.getFullYear() || day.lastSentDate!.getMonth() != now.getMonth() || day.lastSentDate!.getDate() != now.getDate();
                 if (now.getDay() == day.dayIndex && hasntSentToday && day.telegramGifId) {
@@ -110,13 +88,12 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
         try {
             const gifId = ctx.message.document.file_id;
             this.waitingForGifDayOfWeek.telegramGifId = gifId;
-            const copied: DayOfWeek = {
-                regExp: this.waitingForGifDayOfWeek.regExp,
+            const copied = new GifBindedWeekday({                
                 telegramGifId: this.waitingForGifDayOfWeek.telegramGifId,
                 dayIndex: this.waitingForGifDayOfWeek.dayIndex,
-            }
+            });
             this.waitingForGifDayOfWeek = undefined;
-            this.weekdayGifBindings = this.weekdayGifBindings.map((day) => copied.dayIndex == day.dayIndex ? copied : day);
+            this.gifBindedWeekdays = this.gifBindedWeekdays.map((day) => copied.dayIndex == day.dayIndex ? copied : day);
             this.saveWeekdayGifBindigsToLocal();
             ctx.reply('Запомнил гифку, братан');
         } catch {
@@ -125,35 +102,22 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
     }
 
     private saveWeekdayGifBindigsToLocal(): void {
-        this.localStorage.setItem(this.localStorageWeekdayGifBindingsKey, JSON.stringify(this.weekdayGifBindings));
+        this.localStorage.setItem(this.localStorageWeekdayGifBindingsKey, JSON.stringify(this.gifBindedWeekdays));
     }
 
-    private loadWeekdayGifBindingsFromLocal(): Array<DayOfWeek> {
-        let result: Array<DayOfWeek> = [];
+    private loadWeekdayGifBindingsFromLocal() {
         try {
             const saved = this.localStorage.getItem(this.localStorageWeekdayGifBindingsKey);
             if (saved) {
-                result = JSON.parse(saved);
-                result.forEach(((day) => {
-                    if (typeof day.lastSentDate == 'string') {
-                        // Save date in JSON.stringify saving it as string
-                        // TODO: replace DayOfWeek in class and define its fromString() method
-                        day.lastSentDate = new Date(Date.parse(day.lastSentDate as string));
-                    }
-                }))
+                const stringifiedWeekdays = JSON.parse(saved) as Array<StringifiedGifBindedWeekday>;
+                this.gifBindedWeekdays = stringifiedWeekdays.map((day) => GifBindedWeekday.getDayOfWeekFromStringified(day));
             }
         } catch {
             console.log('Не получилось загрузить гифки из локалки');
         }
-        return result;
+
     }
 }
 
-type DayOfWeek = {
-    regExp: RegExp;
-    dayIndex: number;
-    telegramGifId?: string;
-    lastSentDate?: Date;
-}
 
 export { GifsClient };

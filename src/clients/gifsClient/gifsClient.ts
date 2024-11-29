@@ -32,8 +32,12 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
         super();
         this.localStorage = localStorage;
         const savedWeekdayGifBindings = this.loadWeekdayGifBindingsFromLocal();
+        // TODO: remove in loadFromLocalMethod
         if (savedWeekdayGifBindings.length > 0) {
-            this.weekdayGifBindings = savedWeekdayGifBindings;
+            this.weekdayGifBindings.forEach((day) => {
+                day.lastSentDate = savedWeekdayGifBindings[day.dayIndex - 1].lastSentDate;
+                day.telegramGifId = savedWeekdayGifBindings[day.dayIndex - 1].telegramGifId;
+            });
         }
     }
 
@@ -130,6 +134,13 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
             const saved = this.localStorage.getItem(this.localStorageWeekdayGifBindingsKey);
             if (saved) {
                 result = JSON.parse(saved);
+                result.forEach(((day) => {
+                    if (typeof day.lastSentDate == 'string') {
+                        // Save date in JSON.stringify saving it as string
+                        // TODO: replace DayOfWeek in class and define its fromString() method
+                        day.lastSentDate = new Date(Date.parse(day.lastSentDate as string));
+                    }
+                }))
             }
         } catch {
             console.log('Не получилось загрузить гифки из локалки');

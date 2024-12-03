@@ -66,8 +66,7 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
             }
             const now = new Date(Date.now());
             this.gifBindedWeekdays.forEach(async (day) => {
-                if (day.lastSentDate == undefined) return;
-                const hasntSentToday =  day.lastSentDate!.getFullYear() != now.getFullYear() || day.lastSentDate!.getMonth() != now.getMonth() || day.lastSentDate!.getDate() != now.getDate();
+                const hasntSentToday = day.lastSentDate == undefined || day.lastSentDate!.getFullYear() != now.getFullYear() || day.lastSentDate!.getMonth() != now.getMonth() || day.lastSentDate!.getDate() != now.getDate();
                 if (now.getDay() == day.dayIndex && hasntSentToday && day.telegramGifId) {
                     try {
                         const url = await this.chatContext!.telegram.getFileLink(day.telegramGifId);

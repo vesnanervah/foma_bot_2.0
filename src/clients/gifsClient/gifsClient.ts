@@ -8,7 +8,7 @@ class GifsClient extends IntervalCommandClient<Update.MessageUpdate<Record<"text
     private localStorage: LocalStorage;
     private localStorageWeekdayGifBindingsKey = 'weekdays'
     private setGifTriggerRegExp = /^гиф(ка)?$/i;
-    private showWeekdayTriggerRegExp = /^(какой (сейчас )?)?день недели(\?)?$/i;
+    private showWeekdayTriggerRegExp = /^(какой ((сейч)|(щ)ас )?)?день недели(\?)?$/i;
     private gifBindedWeekdays = GifBindedWeekday.generateDaysOfWeek();
     // also an indicator of already started gifs proccessing
     private waitingForGifDayOfWeek?: GifBindedWeekday;
